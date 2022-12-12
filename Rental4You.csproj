@@ -14,9 +14,21 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.10" />
     <PackageReference Include="BootstrapIcons.AspNetCore" Version="1.9.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.10" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="BootstrapIcons.AspNetCore" />
+    <None Remove="Microsoft.VisualStudio.Web.CodeGeneration.Design" />
+    <None Remove="Microsoft.EntityFrameworkCore.Sqlite" />
+    <None Remove="Swashbuckle.AspNetCore" />
+    <None Remove="Views\Users\" />
+    <None Remove="ViewModel\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Users\" />
+    <Folder Include="ViewModel\" />
   </ItemGroup>
 </Project>
