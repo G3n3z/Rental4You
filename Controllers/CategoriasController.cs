@@ -57,6 +57,7 @@ namespace Rental4You.Models
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome")] Categoria categoria)
         {
+            ModelState.Remove(nameof(categoria.Veiculos));
             if (ModelState.IsValid)
             {
                 _context.Add(categoria);
@@ -93,7 +94,7 @@ namespace Rental4You.Models
             {
                 return NotFound();
             }
-
+            ModelState.Remove(nameof(categoria.Veiculos));
             if (ModelState.IsValid)
             {
                 try
