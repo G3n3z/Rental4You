@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace Rental4You.Models
     public class VeiculosController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public VeiculosController(ApplicationDbContext context)
+        public VeiculosController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Veiculos
@@ -37,6 +40,7 @@ namespace Rental4You.Models
                 .Include(v => v.Categoria)
                 .Include(v => v.Empresa)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (veiculo == null)
             {
                 return NotFound();
@@ -48,8 +52,9 @@ namespace Rental4You.Models
         // GET: Veiculos/Create
         public IActionResult Create()
         {
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Id");
-            ViewData["EmpresaId"] = new SelectList(_context.Empresas, "Id", "Id");
+            ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
+            ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
+
             return View();
         }
 
@@ -60,14 +65,35 @@ namespace Rental4You.Models
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo)
         {
+            ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
+            ModelState.Remove(nameof(veiculo.Categoria));
+
+            ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
+            ModelState.Remove(nameof(veiculo.Empresa));
+            
+            ModelState.Remove(nameof(veiculo.Reservas));
+
+            if (veiculo.EmpresaId == -1)
+            {
+                ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+                if (applicationUser.EmpresaId != null)
+                {
+                    veiculo.EmpresaId = (int)applicationUser.EmpresaId;
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Não foi possível criar o veículo!");
+                    return View(veiculo);
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(veiculo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Id", veiculo.CategoriaId);
-            ViewData["EmpresaId"] = new SelectList(_context.Empresas, "Id", "Id", veiculo.EmpresaId);
+
             return View(veiculo);
         }
 
@@ -84,8 +110,10 @@ namespace Rental4You.Models
             {
                 return NotFound();
             }
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Id", veiculo.CategoriaId);
-            ViewData["EmpresaId"] = new SelectList(_context.Empresas, "Id", "Id", veiculo.EmpresaId);
+
+            ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
+            ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
+
             return View(veiculo);
         }
 
@@ -100,6 +128,15 @@ namespace Rental4You.Models
             {
                 return NotFound();
             }
+
+            ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
+            ModelState.Remove(nameof(veiculo.Categoria));
+
+            ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
+            ModelState.Remove(nameof(veiculo.Empresa));
+
+            ModelState.Remove(nameof(veiculo.Reservas));
+
 
             if (ModelState.IsValid)
             {
@@ -121,8 +158,7 @@ namespace Rental4You.Models
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Id", veiculo.CategoriaId);
-            ViewData["EmpresaId"] = new SelectList(_context.Empresas, "Id", "Id", veiculo.EmpresaId);
+            
             return View(veiculo);
         }
 
