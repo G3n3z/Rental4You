@@ -8,7 +8,6 @@ namespace Escola_Segura.Data
     {
         Admin,
         Funcionario,
-        Formador,
         Cliente,
         Gestor
     }

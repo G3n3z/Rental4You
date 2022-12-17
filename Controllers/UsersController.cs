@@ -99,6 +99,13 @@ namespace Rental4You.Controllers
             {
                 return View(userDetails);
             }
+
+            user.DataNascimento = userDetails.DataNascimento;
+            user.Active = userDetails.Active;
+            user.NIF = userDetails.NIF;
+            user.PrimeiroNome = userDetails.PrimeiroNome;
+            user.UltimoNome = userDetails.UltimoNome;
+
             _context.Update(user);
             await _context.SaveChangesAsync();
 
