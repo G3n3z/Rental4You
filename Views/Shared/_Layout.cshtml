@@ -19,28 +19,47 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (User.IsInRole("Admin") || User.IsInRole("Gestor"))
+                        @if (User.IsInRole("Admin"))
                         {
 
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Empresas" asp-action="Index">
-                                        Empresas
-                                    </a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Reservas" asp-action="Index">
-                                        Reservas
-                                    </a>
-                                </li>
-                            }
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Empresas" asp-action="Index">
+                                    Empresas
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Veiculos" asp-action="Index">
                                     Veiculos
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Categorias" asp-action="Index">
+                                    Categorias
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Users" asp-action="Index">
+                                    Utilizadores
+                                </a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Gestor"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Reservas
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-action="Index" asp-controller="Reservas">Todas as Reservas</a></li>
+                                    <li><a class="dropdown-item" asp-action="Index" asp-controller="Reservas" asp-route-pendents="true">Reservas Pendentes</a></li>
+                                    <li><a class="dropdown-item" asp-action="Index" asp-controller="Reservas" asp-route-flag="Entregar">Entregar Veiculos</a></li>
+                                    <li><a class="dropdown-item" asp-action="Index" asp-controller="Reservas" asp-route-flag="Receber">Receber Veiculos </a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Veiculos" asp-action="Index">
+                                    Frota
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -51,6 +70,25 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Users" asp-action="Index">
                                     Utilizadores
+                                </a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Funcionario"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Reservas" asp-action="Index">
+                                    Reservas
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Veiculos" asp-action="Index">
+                                    Frota
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Categorias" asp-action="Index">
+                                    Categorias
                                 </a>
                             </li>
                         }
