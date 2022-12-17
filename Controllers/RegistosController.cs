@@ -19,8 +19,10 @@ namespace Rental4You.Models
         }
 
         // GET: Registos
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Boolean? pendentes, string flag)
         {
+            
+
               return _context.Registos != null ? 
                           View(await _context.Registos.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.Registos'  is null.");

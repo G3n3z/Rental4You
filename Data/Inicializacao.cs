@@ -17,6 +17,7 @@ namespace Escola_Segura.Data
             userManager, RoleManager<IdentityRole> roleManager)
         {
             //Adicionar default Roles
+            //await roleManager.DeleteAsync(roleManager.Roles.Where(r => r.Name == "Formador").First());
             await roleManager.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
             await roleManager.CreateAsync(new IdentityRole(Roles.Funcionario.ToString()));
             await roleManager.CreateAsync(new IdentityRole(Roles.Cliente.ToString()));
