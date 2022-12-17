@@ -56,8 +56,23 @@ namespace Rental4You.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+
+            [Display(Name = "Primeiro Nome")]
+            public string PrimeiroNome { get; set; }
+
+            [Display(Name = "Ultimo Nome")]
+            public string UltimoNome { get; set; }
+
+            [Display(Name = "Data de Nascimento")]
+            [DataType(DataType.Date)]
+            public DateTime DataNascimento { get; set; }
+
+            [StringLength(9, ErrorMessage = "O {0} tem de ser composto por {1} digitos.", MinimumLength = 9)]
+            [RegularExpression(@"[0-9]{9}$", ErrorMessage = "O NIF tem de ser composto por 9 digitos.")]
+            public string NIF { get; set; }
+
             [Phone]
-            [Display(Name = "Phone number")]
+            [Display(Name = "Contacto")]
             public string PhoneNumber { get; set; }
         }
 
