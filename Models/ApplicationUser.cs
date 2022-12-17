@@ -21,5 +21,8 @@ namespace Rental4You.Models
         public Empresa Empresa { get; set; }
 
         public ICollection<Reserva> Reservas { get; set; }
+
+        public ICollection<Registo> Registos { get; set; }
+        
     }
 }

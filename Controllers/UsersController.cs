@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Escola_Segura.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Rental4You.Data;
 using Rental4You.Models;
@@ -32,12 +34,14 @@ namespace Rental4You.Controllers
             List<UserRolesViewModel> viewModel = new List<UserRolesViewModel>();
             List<ApplicationUser> users = null;
             ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            ViewBag.userId = applicationUser.Id;
             if (User.IsInRole("Admin"))
             {
                 users = _userManager.Users.ToList();
 
-               
-            }else if (User.IsInRole("Gestor"))
+
+            }
+            else if (User.IsInRole("Gestor"))
             {
                 users = _userManager.Users.Where(user => user.EmpresaId == applicationUser.EmpresaId).ToList();
             }
@@ -45,15 +49,69 @@ namespace Rental4You.Controllers
             {
                 viewModel.Add(UserRolesViewModel.mapUserToViewModel(user, _userManager.GetRolesAsync(user).GetAwaiter().GetResult()));
             });
-            
+
             return View(viewModel);
+        }
+
+
+        public async Task<IActionResult> Create()
+        {
+            List<IdentityRole> roles = _roleManager.Roles.Where(r => r.Name == Roles.Gestor.ToString() || r.Name == Roles.Funcionario.ToString()).ToList();
+            ViewData["Roles"] = new SelectList(roles, "Name", "Name");
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,PrimeiroNome,UltimoNome,DataNascimento,Email,NIF,EmpresaId")] ApplicationUser user, string role)
+        {
+
+            user.Active = true;
+            ModelState.Remove(nameof(user.Empresa));
+            ModelState.Remove(nameof(user.Reservas));
+            ModelState.Remove(nameof(user.Registos));
+
+            List<IdentityRole> roles;
+            roles = _roleManager.Roles.Where(r => r.Name == Roles.Gestor.ToString() || r.Name == Roles.Funcionario.ToString()).ToList();
+            ViewData["Roles"] = new SelectList(roles, "Name", "Name");
+
+            if (role == null || (role != Roles.Funcionario.ToString() && role != Roles.Gestor.ToString()))
+            {
+                return View(user);
+            }
+            ApplicationUser gestor = await _userManager.GetUserAsync(User);
+            user.EmpresaId = gestor.EmpresaId;
+            user.EmailConfirmed = true;
+
+
+            if (ModelState.IsValid)
+            {
+                user.UserName = user.Email;
+                var result = await _userManager.CreateAsync(user, "Funcionario123!");
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", "Nao foi possivel criar o utilizador");
+
+                    return View(user);
+                }
+                result = await _userManager.AddToRoleAsync(user, role);
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", "Nao foi possivel atribuir o role ao utilizador");
+                    return View(user);
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(user);
         }
 
 
 
         public async Task<IActionResult> Edit(string UserId)
         {
-            if(String.IsNullOrEmpty(UserId))
+            if (String.IsNullOrEmpty(UserId))
             {
                 return RedirectToAction("Index");
 
@@ -67,10 +125,11 @@ namespace Rental4You.Controllers
             var roles = _roleManager.Roles.ToList();
             List<string> rolesUser = (List<string>)_userManager.GetRolesAsync(user).GetAwaiter().GetResult();
             UserDetailsViewModel userDetails = UserDetailsViewModel.mapToViewModel(user);
-            
+
             userDetails.roles = new List<RolesViewModel>();
 
-            foreach(var role in roles) { 
+            foreach (var role in roles)
+            {
                 RolesViewModel rolesViewModel = new RolesViewModel();
                 rolesViewModel.RoleId = role.Id;
                 rolesViewModel.RoleName = role.Name;
@@ -80,6 +139,7 @@ namespace Rental4You.Controllers
 
             return View(userDetails);
         }
+
 
 
 
@@ -124,6 +184,66 @@ namespace Rental4You.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeStatus(string userId, [Bind("Active")] Boolean Active)
+        {
+            if(userId == null)
+            {
+                return NotFound();
+            }
+            ApplicationUser user = _userManager.FindByIdAsync(userId).Result;
+            if(user == null)
+            {
+                return NotFound();
+            }
+            user.Active = Active;
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+
+
+        public async Task<IActionResult> Delete(string userId)
+        {
+            if (userId == null || _context.Users == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        // POST: Reservas/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string Id)
+        {
+            if (_context.Users == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.Users'  is null.");
+            }
+            var user = await _context.Users.FindAsync(Id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+            }
+            if(user.Registos != null && user.Registos.Count() != 0)
+            {
+                ModelState.AddModelError("","Não é possivel eliminar um utilizador com reservas");
+                return View(user);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
     }

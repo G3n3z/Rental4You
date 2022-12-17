@@ -19,13 +19,25 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (User.IsInRole("Admin"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("Gestor"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Empresas" asp-action="Index">
-                                    Empresas
-                                </a>
-                            </li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Empresas" asp-action="Index">
+                                        Empresas
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Reservas" asp-action="Index">
+                                        Reservas
+                                    </a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Veiculos" asp-action="Index">
                                     Veiculos

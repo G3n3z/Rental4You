@@ -1,8 +1,29 @@
-﻿@{
+﻿@model Rental4You.ViewModel.PesquisaParametersViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+<div class="container">
+   <form asp-action="Search",  method="get">
+        <div class="row">
+            <div class="col-3 form-group mb-2">
+                <input type="text" asp-for="Localizacao" placeholder="Localização" class="form-control" />
+            </div>
+            <div class="col-3 form-group mb-2">
+                <input asp-for="DataLevantamento" class="form-control" />
+            </div>
+            <div class="col-3 form-group mb-2">
+                <input asp-for="DataEntrega" class="form-control" />
+            </div>
+            <div class="col-3 form-group mb-2">
+                <button type ="submit" class="btn btn-success">Pesquisar</button>
+            </div>
+         </div>
+    </form>
 </div>

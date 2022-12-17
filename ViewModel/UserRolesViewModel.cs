@@ -14,6 +14,7 @@ namespace Rental4You.ViewModel
         public string Email { get; set; }
         public IEnumerable<string> Roles { get; set; }
         public Boolean IsActive { get; set; }
+        public Boolean HaveRegister { get; set; }
 
 
         public static UserRolesViewModel mapUserToViewModel(ApplicationUser user, IList<string> list)
@@ -24,6 +25,7 @@ namespace Rental4You.ViewModel
             viewModel.PrimeiroNome = user.PrimeiroNome;
             viewModel.UltimoNome = user.UltimoNome;
             viewModel.IsActive = user.Active;
+            viewModel.HaveRegister = user.Registos == null ? false : user.Registos.Count() != 0; 
             viewModel.Roles = list;
             return viewModel;
         }
