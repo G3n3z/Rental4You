@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Escola_Segura.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -75,12 +76,14 @@ namespace Rental4You.Models
                 gestor.UltimoNome = "gestor";
                 gestor.PhoneNumber = null;
                 gestor.NIF = "0000000";
-                
+                gestor.UserName = gestor.Email;
                 
                 _context.Add(empresa);  
                 await _context.SaveChangesAsync();
                 gestor.EmpresaId = empresa.Id;
-                await _userManager.CreateAsync(gestor, "gestor");   
+                var result = await _userManager.CreateAsync(gestor, "Gestor123!");
+                
+                await _userManager.AddToRoleAsync(gestor, Roles.Gestor.ToString());
                 return RedirectToAction(nameof(Index));
             }
             return View(empresa);

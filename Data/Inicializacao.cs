@@ -7,6 +7,7 @@ namespace Escola_Segura.Data
     public enum Roles
     {
         Admin,
+        Funcionario,
         Formador,
         Cliente,
         Gestor
@@ -18,7 +19,7 @@ namespace Escola_Segura.Data
         {
             //Adicionar default Roles
             await roleManager.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
-            await roleManager.CreateAsync(new IdentityRole(Roles.Formador.ToString()));
+            await roleManager.CreateAsync(new IdentityRole(Roles.Funcionario.ToString()));
             await roleManager.CreateAsync(new IdentityRole(Roles.Cliente.ToString()));
             await roleManager.CreateAsync(new IdentityRole(Roles.Gestor.ToString()));
             //Adicionar Default User - Admin
