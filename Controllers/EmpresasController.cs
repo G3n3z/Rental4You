@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Escola_Segura.Data;
 using Microsoft.AspNetCore.Identity;
@@ -56,6 +57,11 @@ namespace Rental4You.Models
             return View();
         }
 
+        private bool IsValidEmail(string email)
+        {
+            return Regex.IsMatch(email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+        }
+
         // POST: Empresas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -70,6 +76,11 @@ namespace Rental4You.Models
             {
                 ApplicationUser gestor = new ApplicationUser();
                 gestor.Email = "gestor@" + empresa.Nome + ".pt";
+                if (!IsValidEmail(gestor.Email))
+                {
+                    //TODO
+                }
+
                 gestor.EmailConfirmed = true;
                 gestor.DataNascimento = new DateTime();
                 gestor.PrimeiroNome = "gestor";
