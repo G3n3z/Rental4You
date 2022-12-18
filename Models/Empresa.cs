@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Rental4You.Models
 {
@@ -10,6 +11,7 @@ namespace Rental4You.Models
 
         public string Localidade { get; set; }
 
+        [Display(Name = "Subscrição")]
         [DefaultValue(true)]
         public bool Activo { get; set; }
 
