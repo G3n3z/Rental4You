@@ -4,7 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -98,6 +100,25 @@ namespace Rental4You.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Display(Name = "Primeiro Nome")]
+            public string PrimeiroNome { get; set; }
+
+            [Display(Name = "Ultimo Nome")]
+            public string UltimoNome { get; set; }
+
+            [Display(Name = "Data de Nascimento")]
+            [DataType(DataType.Date)]
+            public DateTime DataNascimento { get; set; }
+            
+            [StringLength(9, ErrorMessage = "O {0} tem de ser composto por {1} digitos.", MinimumLength =9)]
+            [RegularExpression(@"[0-9]{9}$", ErrorMessage = "O NIF tem de ser composto por 9 digitos.")]
+            public string NIF { get; set; }
+            
+            [Phone]
+            [Display(Name = "Contacto")]
+            public string PhoneNumber { get; set; }
+
         }
 
 
@@ -111,17 +132,27 @@ namespace Rental4You.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                user.PrimeiroNome = Input.PrimeiroNome;
+                user.UltimoNome = Input.UltimoNome;
+                user.DataNascimento= Input.DataNascimento;
+                user.NIF = Input.NIF;
+
+                await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    await _userManager.AddToRoleAsync(user, "Cliente");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
