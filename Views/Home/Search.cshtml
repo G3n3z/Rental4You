@@ -1,5 +1,116 @@
-﻿@model IEnumerable<Rental4You.Models.Veiculo>
+﻿@model Rental4You.ViewModel.SearchViewModel
 @{
-    ViewData["Title"] = "Search Page";
+        ViewData["Title"] = "Search Page";
+}
+@* <div class="container">
+    <form asp-action="Search", name="pesquisa" method="get">
+        <div class="row">
+            <div class="col-3 form-group mb-2">
+                <input type="text" name="Localizacao" value="@ViewBag.pesquisa.Localizacao"  placeholder="Localização" class="form-control" />
+            </div>
+            <div class="col-3 form-group mb-2">
+                <input type="date" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento"class="form-control" />
+            </div>
+            <div class="col-3 form-group mb-2">
+                <input type="datetime" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" class="form-control" />
+            </div>
+            <div class="col-3 form-group mb-2">
+                <button type="submit" class="btn btn-success">Pesquisar</button>
+            </div>
+        </div>
+    </form>
+</div> *@
+<div class="container">
+    <form asp-action="Search", name="pesquisa" method="get">
+        <div class="row">
+            <div class="col-4 form-group mb-2">
+                <input type="text" asp-for="Localizacao"  placeholder="Localização" class="form-control" />
+            </div>
+            <div class="col-4 form-group mb-2">
+                <input asp-for="DataLevantamento" class="form-control" />
+            </div>
+            <div class="col-4 form-group mb-2">
+                <input asp-for="DataEntrega" class="form-control" />
+            </div>
+            
+        </div>
+        <div class="row">
+            <div class="col-12">Filtros:</div>
+        </div>
+        <div class="row">
+            <div class="col-3 form-group mb-2">
+                <label asp-for="FiltroEmpresa"> Empresa</label>
+                <select asp-for="FiltroEmpresa" asp-items="ViewBag.Empresas" class="form-control"></select>
+            </div>
+            <div class="col-3 form-group mb-2">
+                <label asp-for="FiltroEmpresa"> Categorias</label>
+                <select asp-for="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control"></select>
+            </div>
+            
+        </div>
+        <div class="row">
+            <div class="col-12">Ordenar Por:</div>
+        </div>
+        <div class="row">
+            <div class="col-3 form-group mb-2">
+                <select asp-for="Order" asp-items="ViewBag.Order" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-3 form-group mb-2">
+                <button type="submit" class="btn btn-success">Pesquisar</button>
+        </div>
+    </form>
+</div>
+
+<div class="list-group"></div>
+@foreach(var veiculo in Model.Veiculos)
+{
+    <div class="list-group-item list-group-item-action flex-column align-items-start" >
+        <div class="row">
+            <div class="col-4">
+                PHOTO
+            </div>
+            <div class="col-2">
+                <div>@veiculo.Veiculo.Nome</div>
+                <div>@veiculo.Veiculo.Descricao</div>
+
+            </div>
+            <div class="col-2">
+                <div>
+                    <label>Preco:</label>
+                    <label>@veiculo.Veiculo.CustoDia€/Dia </label>
+                </div>
+                <div>Empresa: @veiculo.Empresa.Nome</div>
+            </div>
+            <div class="col-2">
+                <div>
+                    <label>Preço Total: </label>
+                    <label>@veiculo.Preco€</label>
+                </div>
+            </div>
+            <div class="col-2">
+                <form asp-controller="Reservas" asp-action="NovaReserva" method="post">
+                    <input type="hidden" name="idVeiculo" value="@veiculo.Veiculo.Id" />
+                    <input type="hidden" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento" />
+                    <input type="hidden" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" />
+                    <button type="submit" class="btn btn-success">Reservar</button>
+                </form>
+            </div>
+        </div>
+    </div>
 }
 
+
+
+
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    </ul>
+</nav>

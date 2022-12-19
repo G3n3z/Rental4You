@@ -1,4 +1,4 @@
-﻿@model Rental4You.ViewModel.PesquisaParametersViewModel
+﻿@model Rental4You.ViewModel.SearchViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -11,19 +11,22 @@
 
 <div class="container">
    <form asp-action="Search",  method="get">
-        <div class="row">
-            <div class="col-3 form-group mb-2">
-                <input type="text" asp-for="Localizacao" placeholder="Localização" class="form-control" />
-            </div>
-            <div class="col-3 form-group mb-2">
-                <input asp-for="DataLevantamento" class="form-control" />
-            </div>
-            <div class="col-3 form-group mb-2">
-                <input asp-for="DataEntrega" class="form-control" />
-            </div>
-            <div class="col-3 form-group mb-2">
-                <button type ="submit" class="btn btn-success">Pesquisar</button>
-            </div>
-         </div>
+       <div class="row">
+           <div class="col-2 form-group mb-2">
+               <input type="text" asp-for="Localizacao" placeholder="Localização" class="form-control" />
+           </div>
+           <div class="col-3 form-group mb-2">
+               <input asp-for="DataLevantamento" class="form-control" />
+           </div>
+           <div class="col-3 form-group mb-2">
+               <input asp-for="DataEntrega" class="form-control" />
+           </div>
+           <div class="col-2 form-group mb-2">
+               <select name="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control" ></select>
+           </div>
+           <div class="col-2 form-group mb-2">
+               <button type="submit" class="btn btn-success">Pesquisar</button>
+           </div>
+       </div>
     </form>
 </div>

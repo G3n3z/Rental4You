@@ -8,25 +8,40 @@
 
 <h4>Reserva</h4>
 <hr />
+
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Custom jumbotron</h1>
+        <p class="col-md-8 fs-4">Using a series of utilities, you can create this jumbotron, just like the one in previous versions of Bootstrap. Check out the examples below for how you can remix and restyle it to your liking.</p>
+        <button class="btn btn-primary btn-lg" type="button">Example button</button>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form >
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Concluido" /> @Html.DisplayNameFor(model => model.Concluido)
-                </label>
+            <div class="form-group">
+                <label asp-for="DataLevantamento" class="control-label"></label>
+                <input asp-for="DataLevantamento" class="form-control" />
             </div>
             <div class="form-group">
-                <label asp-for="VeiculoId" class="control-label"></label>
-                <select asp-for="VeiculoId" class ="form-control" asp-items="ViewBag.VeiculoId"></select>
+                <label asp-for="DataEntrega" class="control-label"></label>
+                <input asp-for="DataEntrega" class="form-control" />
             </div>
             <div class="form-group">
-                <label asp-for="ApplicationUserId" class="control-label"></label>
-                <select asp-for="ApplicationUserId" class ="form-control" asp-items="ViewBag.ApplicationUserId"></select>
+                <label asp-for="Veiculo.CustoDia" class="control-label"></label>
+                <input asp-for="Veiculo.CustoDia" disabled class="form-control" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label asp-for="CustoTotal" class="control-label"></label>
+                <input asp-for="CustoTotal" disabled class="form-control" />
+            </div>
+            <div class="form-group">
+                <button type="submit" asp-action="Create" class="btn btn-primary" >Reservar</button>
+            </div>
+            <div class="form-group">
+                <button type="submit" asp-action="NovaReserva" class="btn btn-primary">Calcular</button>
             </div>
         </form>
     </div>
@@ -39,3 +54,33 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+
+@*<section class="light">
+    <div class="container py-2">
+        <div class="h1 text-center text-dark" id="pageHeaderTitle">My Cards Light</div>
+
+        <article class="postcard light blue">
+            <a class="postcard__img_link" href="#">
+                <img class="postcard__img" src="https://picsum.photos/1000/1000" alt="Image Title" />
+            </a>
+            <div class="postcard__text t-dark">
+                <h1 class="postcard__title blue"><a href="#">Podcast Title</a></h1>
+                <div class="postcard__subtitle small">
+                    <time datetime="2020-05-25 12:00:00">
+                        <i class="fas fa-calendar-alt mr-2"></i>Mon, May 25th 2020
+                    </time>
+                </div>
+                <div class="postcard__bar"></div>
+                <div class="postcard__preview-txt">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi, fugiat asperiores inventore beatae accusamus odit minima enim, commodi quia, doloribus eius! Ducimus nemo accusantium maiores velit corrupti tempora reiciendis molestiae repellat vero. Eveniet ipsam adipisci illo iusto quibusdam, sunt neque nulla unde ipsum dolores nobis enim quidem excepturi, illum quos!</div>
+                <ul class="postcard__tagbox">
+                    <li class="tag__item"><i class="fas fa-tag mr-2"></i>Podcast</li>
+                    <li class="tag__item"><i class="fas fa-clock mr-2"></i>55 mins.</li>
+                    <li class="tag__item play blue">
+                        <a href="#"><i class="fas fa-play mr-2"></i>Play Episode</a>
+                    </li>
+                </ul>
+            </div>
+        </article>
+    </div>
+</section>*@

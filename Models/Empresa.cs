@@ -11,6 +11,10 @@ namespace Rental4You.Models
 
         public string Localidade { get; set; }
 
+
+        [DefaultValue(0.0)]
+        public double MediaAvaliacao { get; set; }
+
         [Display(Name = "Subscrição")]
         [DefaultValue(true)]
         public bool Activo { get; set; }
@@ -20,5 +24,6 @@ namespace Rental4You.Models
         public ICollection<Avaliacao> Avaliacoes { get; set; }
 
         public ICollection<ApplicationUser> Utilizadores { get; set; }
+
     }
 }
