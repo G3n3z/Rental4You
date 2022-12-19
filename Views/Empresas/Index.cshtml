@@ -2,23 +2,48 @@
 
 @{
     ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Empresas</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Adicionar Empresa</a>
 </p>
-<table class="table">
+
+<div class="row">
+    
+    <div class="col-10">
+        <form method="post">
+            Nome:
+            <input type="text" id="TextoAPesquisar" name="TextoAPesquisar" value="@ViewBag.TextoPesquisa">
+    
+            <select name="Localidade" asp-items="ViewBag.ListaDeLocalidades"></select>
+
+            <select name="Subscricao" asp-items="ViewBag.Subscricao"></select>
+
+            <drop-down-list class="form__field field" asp-for="Subscricao" asp-items="ViewBag.Subscricao" />
+            
+            <input type="submit" value="Pesquisar" />
+            <a asp-action="Index" asp-controller="Empresas">Limpar Filtros</a>
+        </form>
+        
+    </div>
+    
+</div>
+
+<table class="table table-striped table-hover table-bordered mt-4">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Nome)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NomeSortParam"]">@Html.DisplayNameFor(model => model.Nome)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Localidade)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["LocalSortParam"]">@Html.DisplayNameFor(model => model.Localidade)</a>
             </th>
-            <th></th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["SubscricaoSortParam"]">@Html.DisplayNameFor(model => model.Activo)</a>
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -30,10 +55,18 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Localidade)
             </td>
+            @if(item.Activo == true)
+            {
+                <td>Ativa</td>
+            }
+            else
+            {
+                <td>Inativa</td>
+            }
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Remover</a>
             </td>
         </tr>
 }

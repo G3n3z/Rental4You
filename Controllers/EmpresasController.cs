@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Rental4You.Data;
 
@@ -24,13 +25,94 @@ namespace Rental4You.Models
             _userManager = userManager;
         }
 
-        // GET: Empresas
-        public async Task<IActionResult> Index()
+        private IEnumerable<SelectListItem> GetSubscricao()
         {
-         
-            return _context.Empresas != null ? 
-                          View(await _context.Empresas.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Empresas'  is null.");
+            return new SelectListItem[]
+            {
+                new SelectListItem() { Text = "Ativa", Value = "true" },
+                new SelectListItem() { Text = "Inativa", Value = "false" }
+            };
+        }
+
+        // GET: Empresas
+        public async Task<IActionResult> Index(string sortOrder)
+        {
+            var localidades = await _context.Empresas.Select(x => x.Localidade).ToListAsync();
+
+            ViewData["ListaDeLocalidades"] = new SelectList(_context.Empresas.Select(x => x.Localidade).ToList().Distinct());
+            ViewData["Subscricao"] = GetSubscricao();
+
+            ViewData["NomeSortParam"] = string.IsNullOrEmpty(sortOrder) ? "nome_desc" : "";
+            ViewData["LocalSortParam"] = sortOrder == "Local" ? "local_desc" : "Local";
+            ViewData["SubscricaoSortParam"] = sortOrder == "Subscricao" ? "subscricao_desc" : "Subscricao";
+                        
+            var resultado = from c in _context.Empresas
+                            select c;
+
+            switch (sortOrder)
+            {
+                case "nome_desc":
+                    resultado = resultado.OrderByDescending(s => s.Nome);
+                    break;
+                case "Local":
+                    resultado = resultado.OrderBy(s => s.Localidade);
+                    break;
+                case "local_desc":
+                    resultado = resultado.OrderByDescending(s => s.Localidade);
+                    break;
+                case "Subscricao":
+                    resultado = resultado.OrderBy(s => s.Activo);
+                    break;
+                case "subscricao_desc":
+                    resultado = resultado.OrderByDescending(s => s.Activo);
+                    break;
+                default:
+                    resultado = resultado.OrderBy(s => s.Nome);
+                    break;
+            }
+
+            return View(await resultado.AsNoTracking().ToListAsync());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(string sortOrder, string TextoAPesquisar, string Localidade, string Subscricao)
+        {
+            SelectList listLocalidades = new SelectList(_context.Empresas.Select(x => x.Localidade).ToList().Distinct());
+            foreach (var item in listLocalidades)
+            {
+                if (item.Text == Localidade)
+                    item.Selected = true;
+            }
+            var listSubscricoes = GetSubscricao();
+            foreach (var item in listSubscricoes)
+            {
+                if (item.Value == Subscricao)
+                    item.Selected = true;
+            }
+
+            ViewData["ListaDeLocalidades"] = listLocalidades;
+            ViewData["Subscricao"] = listSubscricoes;
+            
+            var estadoSubscricao = Subscricao.Equals("true") ? true : false;
+
+            IQueryable<Empresa> resultado;
+
+            if (string.IsNullOrWhiteSpace(TextoAPesquisar))
+            {
+                ViewData["TextoPesquisa"] = "";
+                resultado = from c in _context.Empresas
+                                where c.Localidade == Localidade && c.Activo == estadoSubscricao
+                                select c;
+            }
+            else
+            {
+                ViewData["TextoPesquisa"] = TextoAPesquisar;
+                resultado = from c in _context.Empresas
+                                where c.Nome.Contains(TextoAPesquisar) && c.Localidade == Localidade && c.Activo == estadoSubscricao
+                                select c;
+            }
+
+            return View(resultado);
         }
 
         // GET: Empresas/Details/5
@@ -67,7 +149,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Localidade")] Empresa empresa)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Localidade,Activo")] Empresa empresa)
         {
             ModelState.Remove(nameof(empresa.Avaliacoes));
             ModelState.Remove(nameof(empresa.Utilizadores));
@@ -121,7 +203,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Localidade")] Empresa empresa)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Localidade,Activo")] Empresa empresa)
         {
             if (id != empresa.Id)
             {
