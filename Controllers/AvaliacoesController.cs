@@ -56,15 +56,35 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,EmpresaId")] Avaliacao avaliacao)
+        public async Task<IActionResult> Create([Bind("Id,ReservaId,EmpresaId,Nota")] Avaliacao avaliacao)
         {
+            ModelState.Remove(nameof(avaliacao.Empresa));
+            ModelState.Remove(nameof(avaliacao.Reserva));
             if (ModelState.IsValid)
             {
-                _context.Add(avaliacao);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Add(avaliacao);
+                    await _context.SaveChangesAsync();
+                    var media = _context.Avaliacoes.Where(a => a.EmpresaId == avaliacao.EmpresaId).Select(a => a.Nota).Average();
+                    var empresa = _context.Empresas.FirstOrDefault(e => e.Id == avaliacao.EmpresaId);
+                    if (empresa == null)
+                    {
+                        return View(avaliacao);
+                    }
+                    empresa.MediaAvaliacao = media;
+                
+                    _context.Update(empresa);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return View(avaliacao);
+                }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmpresaId"] = new SelectList(_context.Empresas, "Id", "Id", avaliacao.EmpresaId);
+            
+                ViewData["EmpresaId"] = new SelectList(_context.Empresas, "Id", "Id", avaliacao.EmpresaId);
             return View(avaliacao);
         }
 
