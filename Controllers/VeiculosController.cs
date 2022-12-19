@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Escola_Segura.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,8 +25,17 @@ namespace Rental4You.Models
         // GET: Veiculos
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Veiculos.Include(v => v.Categoria).Include(v => v.Empresa);
-            return View(await applicationDbContext.ToListAsync());
+            
+            var veiculos = new List<Veiculo>();
+            if(User.IsInRole(Roles.Funcionario.ToString()) || User.IsInRole(Roles.Gestor.ToString())){
+                var user = await _userManager.GetUserAsync(User);
+                veiculos = _context.Veiculos.Include(v => v.Categoria).Include(v => v.Empresa)
+                .Include(r => r.Reservas).Where(v => v.EmpresaId == user.EmpresaId).ToList();
+            }else if(User.IsInRole(Roles.Admin.ToString())){
+                veiculos = _context.Veiculos.Include(r => r.Reservas).Include(v => v.Categoria)
+                .Include(v => v.Empresa).ToList();
+            }
+            return View(veiculos);
         }
 
         // GET: Veiculos/Details/5
@@ -82,7 +92,7 @@ namespace Rental4You.Models
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Não foi possível criar o veículo!");
+                    ModelState.AddModelError("", "Nï¿½o foi possï¿½vel criar o veï¿½culo!");
                     return View(veiculo);
                 }
             }
@@ -137,7 +147,6 @@ namespace Rental4You.Models
 
             ModelState.Remove(nameof(veiculo.Reservas));
 
-
             if (ModelState.IsValid)
             {
                 try
@@ -173,10 +182,15 @@ namespace Rental4You.Models
             var veiculo = await _context.Veiculos
                 .Include(v => v.Categoria)
                 .Include(v => v.Empresa)
+                .Include(v => v.Reservas)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (veiculo == null)
             {
                 return NotFound();
+            }
+
+            if(veiculo.Reservas != null && veiculo.Reservas.Count() >= 0){
+                return RedirectToAction(nameof(Index));
             }
 
             return View(veiculo);
@@ -195,6 +209,10 @@ namespace Rental4You.Models
             if (veiculo != null)
             {
                 _context.Veiculos.Remove(veiculo);
+            }
+            
+            if(veiculo.Reservas != null && veiculo.Reservas.Count() >= 0){
+                return RedirectToAction(nameof(Index));
             }
             
             await _context.SaveChangesAsync();
