@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Escola_Segura.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ using Rental4You.Data;
 
 namespace Rental4You.Models
 {
+    [Authorize(Roles = "Admin")]
     public class EmpresasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,55 +27,132 @@ namespace Rental4You.Models
             _userManager = userManager;
         }
 
-        private IEnumerable<SelectListItem> GetSubscricao()
+        private IEnumerable<SelectListItem> GetSubscriptionFilters()
         {
             return new SelectListItem[]
             {
+                new SelectListItem() { Text = " ", Value = string.Empty },
                 new SelectListItem() { Text = "Ativa", Value = "true" },
                 new SelectListItem() { Text = "Inativa", Value = "false" }
             };
         }
 
-        // GET: Empresas
-        public async Task<IActionResult> Index(string sortOrder)
+        private IEnumerable<SelectListItem> GetLocationFilters(List<Empresa> empresas)
         {
-            var localidades = await _context.Empresas.Select(x => x.Localidade).ToListAsync();
-
-            ViewData["ListaDeLocalidades"] = new SelectList(_context.Empresas.Select(x => x.Localidade).ToList().Distinct());
-            ViewData["Subscricao"] = GetSubscricao();
-
-            ViewData["NomeSortParam"] = string.IsNullOrEmpty(sortOrder) ? "nome_desc" : "";
-            ViewData["LocalSortParam"] = sortOrder == "Local" ? "local_desc" : "Local";
-            ViewData["SubscricaoSortParam"] = sortOrder == "Subscricao" ? "subscricao_desc" : "Subscricao";
-                        
-            var resultado = from c in _context.Empresas
-                            select c;
-
-            switch (sortOrder)
+            var localidades = empresas.Select(e => e.Localidade).Distinct();
+            List<SelectListItem> listItems = new List<SelectListItem>
             {
-                case "nome_desc":
-                    resultado = resultado.OrderByDescending(s => s.Nome);
-                    break;
-                case "Local":
-                    resultado = resultado.OrderBy(s => s.Localidade);
-                    break;
-                case "local_desc":
-                    resultado = resultado.OrderByDescending(s => s.Localidade);
-                    break;
-                case "Subscricao":
-                    resultado = resultado.OrderBy(s => s.Activo);
-                    break;
-                case "subscricao_desc":
-                    resultado = resultado.OrderByDescending(s => s.Activo);
-                    break;
-                default:
-                    resultado = resultado.OrderBy(s => s.Nome);
-                    break;
+                new SelectListItem("", string.Empty)
+            };
+            foreach (var localidade in localidades)
+            {
+                listItems.Add(new SelectListItem(localidade, localidade));
             }
-
-            return View(await resultado.AsNoTracking().ToListAsync());
+            return listItems;
         }
 
+        private IEnumerable<SelectListItem> SelectedListItem(string SelectItem, IEnumerable<SelectListItem> ListItem)
+        {
+            foreach (var item in ListItem)
+            {
+                if (item.Value == SelectItem)
+                {
+                    item.Selected = true;
+                }
+                else
+                {
+                    item.Selected = false;
+                }
+            }
+            return ListItem;
+        }
+
+        private IEnumerable<SelectListItem> GetOrderFilter()
+        {
+            return new SelectListItem[]{
+                new SelectListItem() { Text = " ", Value = string.Empty },
+                new SelectListItem() { Text = "Nome Asc", Value = "nome_asc"},
+                new SelectListItem() { Text = "Nome Desc", Value = "nome_desc" },
+                new SelectListItem() { Text = "Localidade Asc", Value = "loc_asc" },
+                new SelectListItem() { Text = "Localidade Desc", Value = "loc_desc" },
+                new SelectListItem() { Text = "Subscrição Asc", Value = "sub_asc" },
+                new SelectListItem() { Text = "Subscrição Desc", Value = "sub_desc" },                
+            };
+        }
+
+        private IQueryable<Empresa> Order(string sortOrder, IQueryable<Empresa> empresas)
+        {
+            switch (sortOrder)
+            {
+                case "nome_asc":
+                    empresas = empresas.OrderBy(s => s.Nome);
+                    break;
+                case "nome_desc":
+                    empresas = empresas.OrderByDescending(s => s.Nome);
+                    break;
+                case "loc_asc":
+                    empresas = empresas.OrderBy(s => s.Localidade);
+                    break;
+                case "loc_desc":
+                    empresas = empresas.OrderByDescending(s => s.Localidade);
+                    break;
+                case "sub_asc":
+                    empresas = empresas.OrderBy(s => s.Activo);
+                    break;
+                case "sub_desc":
+                    empresas = empresas.OrderByDescending(s => s.Activo);
+                    break;
+            }
+            return empresas.AsQueryable();
+        }
+
+        // GET: Empresas
+        public async Task<IActionResult> Index(string sortOrder, string TextoAPesquisar, string Localidade, string Subscricao)
+        {
+            var filtrosLocalidade = GetLocationFilters(_context.Empresas.ToList());
+            var filtrosSubscricao = GetSubscriptionFilters();
+            var filtrosOrdenacao = GetOrderFilter();
+
+            IQueryable<Empresa> resultado;
+
+            //Filtrar texto de pesquisa
+            if (string.IsNullOrWhiteSpace(TextoAPesquisar))
+            {
+                ViewData["TextoPesquisa"] = "";
+                resultado = _context.Empresas;
+            }
+            else
+            {
+                ViewData["TextoPesquisa"] = TextoAPesquisar;
+                resultado = _context.Empresas.Where(e => e.Nome.Contains(TextoAPesquisar));
+            }
+            //Filtrar Localidade
+            if (!string.IsNullOrWhiteSpace(Localidade))
+            {
+                resultado = resultado.Where(e => e.Localidade == Localidade);
+                filtrosLocalidade = SelectedListItem(Localidade, filtrosLocalidade);
+            }
+            //Filtrar Subscricao
+            if (!string.IsNullOrWhiteSpace(Subscricao))
+            {
+                resultado = resultado.Where(e => e.Activo == (Subscricao == "true"));
+                filtrosSubscricao = SelectedListItem(Subscricao, filtrosSubscricao);
+            }
+            //Aplicar Ordenacao selecionada
+            if (!string.IsNullOrWhiteSpace(sortOrder))
+            {
+                resultado = Order(sortOrder, resultado);
+                filtrosOrdenacao = SelectedListItem(sortOrder, filtrosOrdenacao);
+            }
+
+            ViewData["TextoPesquisa"] = TextoAPesquisar;
+            ViewData["FiltroLocalidade"] = filtrosLocalidade;
+            ViewData["FiltroSubscricao"] = filtrosSubscricao;
+            ViewData["FiltroOrdenacao"] = filtrosOrdenacao;
+
+            return View(await resultado.Include(e => e.Veiculos).AsNoTracking().ToListAsync());
+        }
+        /*
         [HttpPost]
         public async Task<IActionResult> Index(string sortOrder, string TextoAPesquisar, string Localidade, string Subscricao)
         {
@@ -114,7 +193,7 @@ namespace Rental4You.Models
 
             return View(resultado);
         }
-
+        */
         // GET: Empresas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -266,14 +345,15 @@ namespace Rental4You.Models
                 return Problem("Entity set 'ApplicationDbContext.Empresas'  is null.");
             }
             var empresa = _context.Empresas
-                .Include(e => e.Utilizadores)
-                .Include(e => e.Avaliacoes)
+                .Include(e => e.Veiculos)
                 .FirstOrDefault(e => e.Id == id);
 
             if (empresa != null)
             {
                 if(empresa.Veiculos == null || empresa.Veiculos.Count == 0) { 
-                   
+                    var users = _context.Users.Where(u => u.EmpresaId == id);
+                    _context.Users.RemoveRange(users);
+
                     _context.Empresas.Remove(empresa);
                     await _context.SaveChangesAsync();
                 }
