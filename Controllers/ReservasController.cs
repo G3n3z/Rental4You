@@ -39,8 +39,9 @@ namespace Rental4You.Models
             }
             else if (User.IsInRole("Funcionario") || User.IsInRole("Gestor"))
             {
-               var reservas = _context.Reservas.Include(r => r.ApplicationUser).Include(r => r.Veiculo).
-                    Where(r => r.Veiculo.EmpresaId == user.EmpresaId);
+               var reservas = _context.Reservas.Include(r => r.ApplicationUser).Include(r => r.Veiculo)
+                    .Include(r => r.Avaliacao)
+                    .Where(r => r.Veiculo.EmpresaId == user.EmpresaId);
                 return View(reservas);
             }
             
@@ -266,8 +267,27 @@ namespace Rental4You.Models
             return View(reserva);
         }
 
+        
+        [HttpPost]
+        public async Task<IActionResult> ChangeStatus(StatusReserva? newStatus, int? id){
+            if(id == null || newStatus == null){
+                return RedirectToAction(nameof(Index));
+            }
+            var reserva = await _context.Reservas.FindAsync(id);
+            if(reserva == null){
+                return NotFound();
+            }
+            if(reserva.Estado != StatusReserva.pending){
+                return RedirectToAction(nameof(Index));
+            }
+            reserva.Estado = (StatusReserva)newStatus;
+            try{
+                _context.Update(reserva);
+                await _context.SaveChangesAsync();
+            }catch(DbUpdateException ex){}
+            return RedirectToAction(nameof(Index));
 
-
+        }
 
         private bool ReservaExists(int id)
         {
