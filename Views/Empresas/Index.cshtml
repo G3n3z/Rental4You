@@ -8,41 +8,42 @@
 <h1>Empresas</h1>
 
 <p>
-    <a asp-action="Create">Adicionar Empresa</a>
+    <a asp-action="Create" class="btn btn-primary btn-sm">Adicionar Empresa</a>
 </p>
 
 <div class="row">
-    
-    <div class="col-10">
-        <form method="post">
-            Nome:
-            <input type="text" id="TextoAPesquisar" name="TextoAPesquisar" value="@ViewBag.TextoPesquisa">
-    
-            <select name="Localidade" asp-items="ViewBag.ListaDeLocalidades"></select>
-
-            <select name="Subscricao" asp-items="ViewBag.Subscricao"></select>
-
-            <drop-down-list class="form__field field" asp-for="Subscricao" asp-items="ViewBag.Subscricao" />
+    <form method="get" class="container">
+        Nome:
+        <input type="text" id="TextoAPesquisar" name="TextoAPesquisar" value="@ViewBag.TextoPesquisa">
             
-            <input type="submit" value="Pesquisar" />
-            <a asp-action="Index" asp-controller="Empresas">Limpar Filtros</a>
-        </form>
-        
-    </div>
-    
+        <label>Localidade:</label>
+        <select name="Localidade" asp-items="@ViewBag.FiltroLocalidade" class="form-group"></select>
+            
+        <label>Subscrição:</label>
+        <select name="Subscricao" asp-items="@ViewBag.FiltroSubscricao"></select>
+            
+        <label>Ordenar Por:</label>
+        <select name="sortOrder" asp-items="@ViewBag.FiltroOrdenacao"></select>
+
+        <input class="btn btn-success btn-sm" type="submit" value="Pesquisar" />
+        <a class="btn btn-secondary btn-sm" asp-action="Index" asp-controller="Empresas">Limpar Filtros</a>
+    </form>
 </div>
 
-<table class="table table-striped table-hover table-bordered mt-4">
+<table class="table table-striped table-hover table-bordered table-sm mt-4">
     <thead>
         <tr>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["NomeSortParam"]">@Html.DisplayNameFor(model => model.Nome)</a>
+                @Html.DisplayNameFor(model => model.Nome)
             </th>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["LocalSortParam"]">@Html.DisplayNameFor(model => model.Localidade)</a>
+                @Html.DisplayNameFor(model => model.Localidade)
             </th>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["SubscricaoSortParam"]">@Html.DisplayNameFor(model => model.Activo)</a>
+                @Html.DisplayNameFor(model => model.Activo)
+            </th>
+            <th>
+                Ações
             </th>
         </tr>
     </thead>
@@ -64,9 +65,13 @@
                 <td>Inativa</td>
             }
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Remover</a>
+                <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.Id">Editar</a>
+                <label>|</label>
+                <a class="btn btn-warning btn-sm" asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
+                @if(item.Veiculos == null || item.Veiculos.Count() == 0){
+                    <label>|</label>
+                    <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id">Remover</a>
+                }
             </td>
         </tr>
 }
