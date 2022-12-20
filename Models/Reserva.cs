@@ -1,5 +1,12 @@
-﻿namespace Rental4You.Models
+﻿using System.ComponentModel;
+
+namespace Rental4You.Models
 {
+    public enum StatusReserva
+    {
+        pending, approved, rejected, provided, delivered
+
+    }
     public class Reserva
     {
         public int ReservaId { get; set; }
@@ -17,5 +24,21 @@
         public Registo? Entrega { get; set; }
 
         public Avaliacao? Avaliacao { get; set; }
+
+        [DefaultValue(StatusReserva.pending)]
+        public StatusReserva Estado {get; set;}
+        public static string translate(StatusReserva? status){
+            if(status == null) return "";
+            switch(status){
+                case StatusReserva.pending :
+                    return "Pendente";
+                case StatusReserva.approved:
+                    return "Aprovado";
+                case StatusReserva.rejected:
+                    return "Rejeitado";
+                default: 
+                    return "";  
+            }
+        }
     }
 }

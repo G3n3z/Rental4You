@@ -4,11 +4,37 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
+@if (User.IsInRole("Admin"))
+{
+    <h1>Veiculos</h1>
+}else{
+    <h1>Frota</h1>
+}
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
+
+<form asp-action="Index" method="get" class="container">
+    <div class="row">
+        <div class="col-3 mb-2">
+            <label>Categorias</label>
+            <select name="Categoria" asp-items=@ViewBag.Categorias class="custom-select mb-2"></select>
+        </div>
+        <div class="col-3 form-group mb-2">
+            <label>Estado</label>
+            <select name="statusVeiculo" asp-items=@ViewBag.Estado class="form-group"></select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 form-group mb-2">
+            <label>Ordenar por:</label>
+            <select name="order" asp-items=@ViewBag.Order class="form-group"></select>
+        </div>
+        <div class="col-3 form-group mb-2">
+            <button type="submit" class="btn btn-success">Pesquisar</button>
+        </div>
+    </div>
+</form>
 <table class="table">
     <thead>
         <tr>
@@ -61,9 +87,11 @@
                 @Html.DisplayFor(modelItem => item.Categoria.Nome)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn-sm btn-warning">Edit</a> 
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn-sm btn-success">Details</a> 
+                @if(item.Reservas == null || item.Reservas.Count() == 0){
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn-sm btn-danger">Delete</a>
+                }
             </td>
         </tr>
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Escola_Segura.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,11 +23,48 @@ namespace Rental4You.Models
         }
 
         // GET: Veiculos
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string Categoria, StatusVeiculo? statusVeiculo, string order)
         {
-            var applicationDbContext = _context.Veiculos.Include(v => v.Categoria).Include(v => v.Empresa);
-            return View(await applicationDbContext.ToListAsync());
+            var filtrosCategorias = GetFilterCategorias(_context.Categorias.ToList());
+            var filtrosEstado = GetFilterEstado();
+            var OrderList = GetOrder();
+            IQueryable<Veiculo>? veiculos = null;
+            var model = new List<Veiculo>();
+            if(User.IsInRole(Roles.Funcionario.ToString()) || User.IsInRole(Roles.Gestor.ToString())){
+                var user = await _userManager.GetUserAsync(User);
+                veiculos = _context.Veiculos.Include(v => v.Categoria).Include(v => v.Empresa)
+                .Include(r => r.Reservas).Where(v => v.EmpresaId == user.EmpresaId);
+            }else if(User.IsInRole(Roles.Admin.ToString())){
+                veiculos = _context.Veiculos.Include(r => r.Reservas).Include(v => v.Categoria)
+                .Include(v => v.Empresa);
+            }
+            if(veiculos != null && !String.IsNullOrEmpty(Categoria)){
+                veiculos = veiculos.Where(v => v.Categoria.Nome == Categoria);
+                filtrosCategorias = SelectListItem(Categoria, filtrosCategorias);
+            }
+            if(veiculos != null && statusVeiculo != null){
+                if(statusVeiculo == StatusVeiculo.A_CIRCULAR){
+                    veiculos = veiculos.Where(v => v.Reservas.Where(r => r.Levantamento != null && r.Entrega == null).Count() > 0);
+                }else if(statusVeiculo == StatusVeiculo.DISPONIVEL){
+                    veiculos = veiculos.Where(v => v.Reservas.Where(r => r.Levantamento != null).Count() == 0);
+                }
+                filtrosEstado = SelectListItem(statusVeiculo.ToString(), filtrosEstado);
+            }
+            if(veiculos != null && !String.IsNullOrEmpty(order))
+            {
+                veiculos = OrderBy(order, veiculos);
+                OrderList = SelectListItem(order, OrderList);
+            }
+
+
+            model = veiculos?.ToList();
+            ViewData["Categorias"] = filtrosCategorias;
+            ViewData["Estado"] = filtrosEstado;
+            ViewData["Order"] = OrderList;
+            return View(model);
         }
+
+
 
         // GET: Veiculos/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -82,7 +120,7 @@ namespace Rental4You.Models
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Não foi possível criar o veículo!");
+                    ModelState.AddModelError("", "Nï¿½o foi possï¿½vel criar o veï¿½culo!");
                     return View(veiculo);
                 }
             }
@@ -137,7 +175,6 @@ namespace Rental4You.Models
 
             ModelState.Remove(nameof(veiculo.Reservas));
 
-
             if (ModelState.IsValid)
             {
                 try
@@ -173,10 +210,15 @@ namespace Rental4You.Models
             var veiculo = await _context.Veiculos
                 .Include(v => v.Categoria)
                 .Include(v => v.Empresa)
+                .Include(v => v.Reservas)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (veiculo == null)
             {
                 return NotFound();
+            }
+
+            if(veiculo.Reservas != null && veiculo.Reservas.Count() >= 0){
+                return RedirectToAction(nameof(Index));
             }
 
             return View(veiculo);
@@ -197,8 +239,112 @@ namespace Rental4You.Models
                 _context.Veiculos.Remove(veiculo);
             }
             
+            if(veiculo.Reservas != null && veiculo.Reservas.Count() >= 0){
+                return RedirectToAction(nameof(Index));
+            }
+            
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+        private IEnumerable<SelectListItem> GetFilterCategorias(List<Categoria> categorias)
+        {
+            var filter = categorias.Select(categoria => categoria.Nome).Distinct().ToArray();
+            var items = new SelectListItem[filter.Count() + 1];
+            items[0] = new SelectListItem() { Text = " ", Value = string.Empty };
+            for (int i = 1; i < filter.Count()+1; i++)
+            {
+                items[i] = new SelectListItem() { Text = filter[i-1], Value = filter[i-1] };
+            }
+            return items;
+        }
+         private IEnumerable<SelectListItem> GetFilterEstado()
+        {
+            return  new SelectListItem[]{
+                new SelectListItem() { Text = " ", Value = string.Empty },
+                new SelectListItem() { Text = "Disponivel", Value = StatusVeiculo.DISPONIVEL.ToString() },
+                new SelectListItem() { Text = "A Circular", Value = StatusVeiculo.A_CIRCULAR.ToString() }
+            };
+        }
+
+        private IEnumerable<SelectListItem> GetOrder()
+        {
+            return new SelectListItem[]{
+                new SelectListItem() { Text = " ", Value = string.Empty },
+                new SelectListItem() { Text = "Nome Asc", Value = "nome asc"},
+                new SelectListItem() { Text = "Nome Desc", Value = "nome desc" },
+                new SelectListItem() { Text = "Custo Desc", Value = "custo dia asc" },
+                new SelectListItem() { Text = "Custo Desc", Value = "custo dia desc" },
+                new SelectListItem() { Text = "Disponivel Asc", Value = "disponibilidade asc" },
+                new SelectListItem() { Text = "Disponivel Desc", Value = "disponibilidade desc" },
+                new SelectListItem() { Text = "Categoria Asc", Value = "categoria asc" },
+                new SelectListItem() { Text = "Categoria Desc", Value = "categoria desc" },
+            };
+        }
+
+        private IQueryable<Veiculo> OrderBy(string order, IQueryable<Veiculo> veiculos)
+        {
+            switch (order)
+            {
+                case "nome asc":
+                {
+                     veiculos = veiculos.OrderBy(v => v.Nome);
+                    break;
+                }
+                case "nome desc":
+                {
+                    veiculos = veiculos.OrderByDescending(v => v.Nome);
+                    break;
+                }
+                case "custo dia asc":
+                {
+                    veiculos = veiculos.OrderBy(v => v.CustoDia);
+                    break;
+                }
+                case "custo dia desc":
+                {
+                    veiculos = veiculos.OrderByDescending(v => v.CustoDia);
+                    break;
+                }
+                case "disponibilidade asc":
+                {
+                    veiculos = veiculos.OrderBy(v => v.Disponivel);
+                    break;
+                }
+                case "disponibilidade desc":
+                {
+                    veiculos = veiculos.OrderByDescending(v => v.Disponivel);
+                    break;
+                }
+                case "categoria asc":
+                {
+                    veiculos = veiculos.OrderByDescending(v => v.Categoria.Nome);
+                    break;
+                }
+                case "categoria desc":
+                {
+                    veiculos = veiculos.OrderByDescending(v => v.Categoria.Nome);
+                    break;
+                }
+            }
+
+            
+
+            return veiculos;
+        }
+        private IEnumerable<SelectListItem> SelectListItem(string SelectItem, IEnumerable<SelectListItem> ListItem)
+        {
+            foreach (var item in ListItem)
+            {
+                if (item.Value == SelectItem)
+                {
+                    item.Selected = true;
+                }
+                else
+                {
+                    item.Selected = false;
+                }
+            }
+            return ListItem;
         }
 
         private bool VeiculoExists(int id)
