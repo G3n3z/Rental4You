@@ -157,7 +157,7 @@ namespace Rental4You.Models
             if (ModelState.IsValid)
             {
                 ApplicationUser gestor = new ApplicationUser();
-                gestor.Email = "gestor@" + empresa.Nome + ".pt";
+                gestor.Email = "gestor@" + empresa.Nome.ToLower() + ".pt";
                 if (!IsValidEmail(gestor.Email))
                 {
                     //TODO
@@ -265,10 +265,15 @@ namespace Rental4You.Models
             {
                 return Problem("Entity set 'ApplicationDbContext.Empresas'  is null.");
             }
-            var empresa = await _context.Empresas.FindAsync(id);
+            var empresa = _context.Empresas
+                .Include(e => e.Utilizadores)
+                .Include(e => e.Avaliacoes)
+                .FirstOrDefault(e => e.Id == id);
+
             if (empresa != null)
             {
                 if(empresa.Veiculos == null || empresa.Veiculos.Count == 0) { 
+                   
                     _context.Empresas.Remove(empresa);
                     await _context.SaveChangesAsync();
                 }
