@@ -1,4 +1,4 @@
-@model IEnumerable<Rental4You.Models.Reserva>
+@model Rental4You.ViewModel.ReservasSearchViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -6,20 +6,68 @@
 
 <h1>Reservas</h1>
 
+<form asp-action="Index" method="get">
+    <div class="row">
+        <div class="col-2 form-group mb-2">
+            <label>Nome do Cliente</label>
+            <input type="text" asp-for="NomeCliente" name="NomeCliente" class="field"/>
+        </div>
+
+        <div class="col-2 form-group mb-2">
+            <label>Veiculo</label>
+            <input type="text" asp-for="Veiculo" name="Veiculo" class="field"/>
+        </div>
+        <div class="col-2 mb-2">
+            <label>Data de Levantamento</label>
+            <input asp-for="DataLevantamento" name="DataLevantamento" asp-format="{0:yyyy-MM-ddTHH:mm}" class="field" />
+        </div>
+        <div class="col-2 mb-2">
+            <label>Data de Entrega</label>
+            <input asp-for="DataEntrega" name="DataEntrega" asp-format="{0:yyyy-MM-ddTHH:mm}" class="field"   />
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-2 form-group mb-2">
+            <label class="col-12">Estado:</label>
+            <select name="Estado" asp-items=@ViewBag.Estado class="form-group mb-2 field"></select>
+        </div>
+        <div class="col-2 form-group mb-2">
+            <label class="col-12">Categorias:</label>
+            <select name="Categoria" asp-items=@ViewBag.Categorias class="form-group field"></select>
+        </div>
+        <div class="col-2 form-group mb-2">
+            <label>Ordenar por:</label>
+            <select name="order" asp-items=@ViewBag.Order class="form-group field"></select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2 form-group mb-2">
+            <div type="button" id="btnreset" class="btn btn-success field">Limpar Filtros</div>
+        </div>
+        <div class="col-2 form-group mb-2">
+            <button type="submit" class="btn btn-success field">Pesquisar</button>
+        </div>
+    </div>
+</form>
+
+
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Veiculo.Nome)
+                Nome
             </th>
-            @if(!User.IsInRole("Cliente")){
+            @if (!User.IsInRole("Cliente"))
+            {
                 <th>
                     Utilizador
                 </th>
             }
             <th>
-                Avaliação    
+                Avaliação
             </th>
             <th>
                 Data de Levantamento
@@ -28,69 +76,91 @@
                 Data de Entrega
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Concluido)
+                Concluido
             </th>
             <th>Acções</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Veiculo.Nome)
-            </td>
-            @if(!User.IsInRole("Cliente")){
-                <td>    
-                    @item.ApplicationUser.PrimeiroNome
+        @foreach (var item in Model.reservas)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Veiculo.Nome)
                 </td>
-            }
-            @if(item.Avaliacao == null){
-                <td>--</td>
-                
-            }else{
-                <td>@item.Avaliacao.Nota/10</td>
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.DataLevantamento)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataEntrega)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Concluido)
-            </td>
-            <td>
-                <div class="row">
-                    <div class="col-3">
-                        <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-success">Details</a>
+                @if (!User.IsInRole("Cliente"))
+                {
+                    <td>
+                        @item.ApplicationUser.PrimeiroNome
+                    </td>
+                }
+                @if (item.Avaliacao == null)
+                {
+                    <td>--</td>
+
+                }
+                else
+                {
+                    <td>@item.Avaliacao.Nota/10</td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.DataLevantamento)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DataEntrega)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Concluido)
+                </td>
+                <td>
+                    <div class="row">
+                        <div class="col-3">
+                            <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-success">Details</a>
+                        </div>
+                        @if (item.Estado == StatusReserva.pending)
+                        {
+                            <div class="col-3">
+                                <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post">
+                                    <input type="hidden" name="newStatus" value="@StatusReserva.approved" />
+                                    <button type="submit" class="btn btn-success">Aprovar</button>
+                                </form>
+                            </div>
+                            <div class="col-3">
+                                <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post">
+                                    <input type="hidden" name="newStatus" value="@StatusReserva.rejected" />
+                                    <button type="submit" class="btn btn-danger">Rejeitar</button>
+                                </form>
+                            </div>
+                        }
+                        else if (item.Estado == StatusReserva.approved)
+                        {
+                            <div class="col-3">
+                                @if (item.Levantamento == null)
+                                {
+                                    <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-warning">Levantamento</a>
+                                }
+                                else if (item.Entrega == null)
+                                {
+                                    <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-warning">Entrega</a>
+                                }
+                            </div>
+                        }
                     </div>
-                    @if(item.Estado == StatusReserva.pending){
-                        <div class="col-3">
-                            <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post">
-                                <input type="hidden" name="newStatus" value="@StatusReserva.approved"/>
-                                <button type="submit" class="btn btn-success">Aprovar</button>
-                            </form>
-                        </div>
-                        <div class="col-3">
-                            <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post" >
-                                <input type="hidden" name="newStatus" value="@StatusReserva.rejected"/>
-                                <button type="submit" class="btn btn-danger">Rejeitar</button>
-                            </form>
-                        </div>
-                    }
-                    else if (item.Estado == StatusReserva.approved)
-                    {   
-                        <div class="col-3">
-                            @if(item.Levantamento == null){
-                                <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-warning">Levantamento</a>
-                            }else if(item.Entrega == null){
-                                <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-warning">Entrega</a>
-                            }
-                        </div>
-                    }
-                </div>
-            </td>
-        </tr>
-}
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+
+<script>
+
+    document.getElementById('btnreset').addEventListener('click', function (event) {
+        console.log("Aqui")
+        var fields = document.getElementsByClassName('field')
+        for (let f of fields) {
+            f.value = ""
+        }
+    });
+
+</script>
