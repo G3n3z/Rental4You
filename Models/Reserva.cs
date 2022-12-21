@@ -4,7 +4,7 @@ namespace Rental4You.Models
 {
     public enum StatusReserva
     {
-        pending, approved, rejected, provided, delivered
+        approved, delivered, pending, provided, rejected
 
     }
     public class Reserva

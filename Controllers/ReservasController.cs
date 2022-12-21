@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Rental4You.Data;
+using Rental4You.ViewModel;
 
 namespace Rental4You.Models
 {
@@ -23,29 +24,72 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([Bind("DataLevantamento,DataEntrega,NomeCliente,Veiculo,Estado, Categoria, order")]ReservasSearchViewModel viewModel )
         {
+            var EstadoList = GetEstado();
+            var CategoriaList = GetCategoria(_context.Categorias.ToList());
+            var Order = GetOrder();
             var user = await _userManager.GetUserAsync(User);
+            IQueryable<Reserva> reservas = null;
             if(user == null)
             {
                 return View();
             }
             if (User.IsInRole("Cliente"))
             {
-                 var reservas = _context.Reservas.Include(r => r.ApplicationUser).Where(r => r.ApplicationUserId == user.Id)
+                reservas = _context.Reservas.Include(r => r.ApplicationUser).Where(r => r.ApplicationUserId == user.Id)
                     .OrderByDescending(r => r.DataLevantamento)
                     .ThenByDescending(r => r.CustoTotal);
-                return View(reservas);
+                
             }
             else if (User.IsInRole("Funcionario") || User.IsInRole("Gestor"))
             {
-               var reservas = _context.Reservas.Include(r => r.ApplicationUser).Include(r => r.Veiculo)
+                reservas = _context.Reservas.Include(r => r.ApplicationUser).Include(r => r.Veiculo)
                     .Include(r => r.Avaliacao)
                     .Where(r => r.Veiculo.EmpresaId == user.EmpresaId);
-                return View(reservas);
+                
             }
-            
-            return View();
+            if(reservas != null && viewModel.DataLevantamento != null){
+                reservas = reservas.Where(r => r.DataLevantamento >= viewModel.DataLevantamento.Value);
+            }
+
+            if(reservas != null && viewModel.DataEntrega != null){
+                reservas = reservas.Where(r => r.DataEntrega <= viewModel.DataEntrega.Value);
+            }
+
+            if(reservas != null && !String.IsNullOrEmpty(viewModel.NomeCliente)){
+                reservas = reservas.Where(r => (r.ApplicationUser.PrimeiroNome +" "+ 
+                                            r.ApplicationUser.UltimoNome).Contains(viewModel.NomeCliente));
+            }
+
+            if(reservas != null && !String.IsNullOrEmpty(viewModel.Veiculo)){
+                reservas = reservas.Where(r => (r.Veiculo.Nome.Contains(viewModel.Veiculo)));
+            }
+
+            if(reservas != null && !String.IsNullOrEmpty(viewModel.Estado)){
+                reservas = SearchForEstado(viewModel.Estado, reservas);
+                EstadoList = SelectListItem(viewModel.Estado, EstadoList);
+            }
+
+            if(reservas != null && !String.IsNullOrEmpty(viewModel.Categoria)){
+                reservas = reservas.Where(r => r.Veiculo.Categoria.Nome.Contains(viewModel.Categoria));
+                CategoriaList = SelectListItem(viewModel.Categoria, CategoriaList);
+            }
+            if(reservas != null && !String.IsNullOrEmpty(viewModel.order)){
+                reservas = OrderBy(viewModel.order, reservas);
+                Order = SelectListItem(viewModel.order, Order);
+            }
+
+            ViewData["Categorias"] = CategoriaList;
+            ViewData["Estado"] = EstadoList;
+            ViewData["Order"] = Order;
+            ViewData["DataLevantamento"] = viewModel.DataLevantamento;
+            ViewData["DataEntrega"] = viewModel.DataEntrega;
+            ViewData["NomeCliente"] = viewModel.NomeCliente;
+            ViewData["Veiculo"] = viewModel.Veiculo;
+            viewModel.reservas = reservas.ToList();
+            var model = reservas.ToList();
+            return View(viewModel);
         }
 
         // GET: Reservas/Details/5
@@ -288,6 +332,158 @@ namespace Rental4You.Models
             return RedirectToAction(nameof(Index));
 
         }
+
+        private IEnumerable<SelectListItem> GetCategoria(List<Categoria> categorias)
+        {
+            var filter = categorias.Select(categoria => categoria.Nome).Distinct().ToArray();
+            var items = new SelectListItem[filter.Count() + 1];
+            items[0] = new SelectListItem() { Text = " ", Value = string.Empty };
+            for (int i = 1; i < filter.Count()+1; i++)
+            {
+                items[i] = new SelectListItem() { Text = filter[i-1], Value = filter[i-1] };
+            }
+            return items;
+        }
+         private IEnumerable<SelectListItem> GetEstado()
+        {
+            return  new SelectListItem[]{
+                new SelectListItem() { Text = " ", Value = string.Empty },
+                new SelectListItem() { Text = "Pendente", Value = StatusReserva.pending.ToString() },
+                new SelectListItem() { Text = "Rejeitada", Value = StatusReserva.rejected.ToString() },
+                new SelectListItem() { Text = "Approvada", Value = StatusReserva.approved.ToString() },
+                new SelectListItem() { Text = "Levantada", Value = StatusReserva.provided.ToString() },
+                new SelectListItem() { Text = "Concluida", Value = StatusReserva.delivered.ToString() },
+            };
+        }
+
+        private IEnumerable<SelectListItem> GetOrder()
+        {
+            return new SelectListItem[]{
+                new SelectListItem() { Text = " ", Value = string.Empty },
+                new SelectListItem() { Text = "Estado asc", Value = "estado asc"},
+                new SelectListItem() { Text = "Estado Desc", Value = "estado desc" },
+                new SelectListItem() { Text = "Data de Levantamento Asc", Value = "datadelevantamento asc" },
+                new SelectListItem() { Text = "Data de Levantamento Desc", Value = "datadelevantamento desc" },
+                new SelectListItem() { Text = "Data de Entrega Asc", Value = "datadeentrega asc" },
+                new SelectListItem() { Text = "Data de Entrega Desc", Value = "datadeentrega desc" },
+                new SelectListItem() { Text = "Nome do Cliente Asc", Value = "nomedocliente asc" },
+                new SelectListItem() { Text = "Nome do Cliente Desc", Value = "nomedocliente desc" },
+                new SelectListItem() { Text = "Veiculo Asc", Value = "veiculo asc" },
+                new SelectListItem() { Text = "Veiculo Desc", Value = "veiculo desc" },
+                new SelectListItem() { Text = "Categoria Asc", Value = "categoria asc" },
+                new SelectListItem() { Text = "Categoria Desc", Value = "categoria desc" },
+            };
+        }
+
+        private IQueryable<Reserva> OrderBy(string order, IQueryable<Reserva> reservas)
+        {
+            switch (order)
+            {
+                case "estado asc":
+                {
+                     reservas = reservas.OrderBy(r => r.Estado);
+                    break;
+                }
+                case "estado desc":
+                {
+                    reservas = reservas.OrderByDescending(r => r.Estado);
+                    break;
+                }
+                case "datadelevantamento asc":
+                {
+                    reservas = reservas.OrderBy(r => r.DataLevantamento);
+                    break;
+                }
+                case "datadelevantamento desc":
+                {
+                    reservas = reservas.OrderByDescending(r => r.DataEntrega);
+                    break;
+                }
+                case "datadeentrega asc":
+                {
+                    reservas = reservas.OrderBy(r => r.DataEntrega);
+                    break;
+                }
+                case "datadeentrega desc":
+                {
+                    reservas = reservas.OrderByDescending(r => r.DataEntrega);
+                    break;
+                }
+                case "nomedocliente asc":
+                {
+                    reservas = reservas.OrderBy(r => r.ApplicationUser.PrimeiroNome + r.ApplicationUser.UltimoNome);
+                    break;
+                }
+                case "nomedocliente desc":
+                {
+                    reservas = reservas.OrderByDescending(r => r.ApplicationUser.PrimeiroNome + r.ApplicationUser.UltimoNome);
+                    break;
+                }
+                case "veiculo asc":
+                {
+                    reservas = reservas.OrderBy(r => r.Veiculo.Nome);
+                    break;
+                }
+                case "veiculo desc":
+                {
+                    reservas = reservas.OrderByDescending(r => r.Veiculo.Nome);
+                    break;
+                }
+                case "categoria asc":
+                {
+                    reservas = reservas.OrderBy(r => r.Veiculo.Categoria.Nome);
+                    break;
+                }
+                case "categoria desc":
+                {
+                    reservas = reservas.OrderByDescending(r => r.Veiculo.Categoria.Nome);
+                    break;
+                }
+            }
+
+            
+
+            return reservas;
+        }
+
+        private IQueryable<Reserva> SearchForEstado(String Estado, IQueryable<Reserva> Reservas){
+            StatusReserva? status = null;
+            if(Estado == null) return Reservas;
+            
+            if(StatusReserva.approved.ToString() == Estado) {
+                status = StatusReserva.approved;
+            }else if(StatusReserva.pending.ToString() == Estado){
+                status = StatusReserva.pending;
+            }else if(StatusReserva.delivered.ToString() == Estado){
+                status = StatusReserva.delivered;
+            }else if(StatusReserva.rejected.ToString() == Estado){
+                status = StatusReserva.rejected;
+            }else if(StatusReserva.provided.ToString() == Estado){
+                status = StatusReserva.provided;
+            }
+
+            if(status != null){
+                return Reservas.Where(r => r.Estado == status);
+            }
+
+            return Reservas;
+        }
+        private IEnumerable<SelectListItem> SelectListItem(string SelectItem, IEnumerable<SelectListItem> ListItem)
+        {
+            foreach (var item in ListItem)
+            {
+                if (item.Value == SelectItem)
+                {
+                    item.Selected = true;
+                }
+                else
+                {
+                    item.Selected = false;
+                }
+            }
+            return ListItem;
+        }
+
 
         private bool ReservaExists(int id)
         {
