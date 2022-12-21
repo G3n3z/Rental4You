@@ -9,19 +9,22 @@
 
 
 <div class="container mt-3">
-   <form asp-action="Search",  method="get">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <form asp-action="Search" method="get">
        <div class="row">
            <div class="col-4 form-group mb-2">
                <input type="text" asp-for="Localizacao" placeholder="Localização" class="form-control" />
+               <span asp-validation-for="Localizacao" class="text-danger"></span>
            </div>
            <div class="col-2 form-group mb-2">
                <input asp-for="DataLevantamento" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+               <span asp-validation-for="DataLevantamento" class="text-danger"></span>
            </div>
            <div class="col-2 form-group mb-2">
                <input asp-for="DataEntrega" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
            </div>
            <div class="col-2 form-group mb-2">
-               <select name="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control" >Categoria:</select>
+               <select name="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control" ></select>
            </div>
            <div class="col-2 form-group mb-2">
                <button type="submit" class="btn btn-success">Pesquisar</button>

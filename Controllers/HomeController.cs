@@ -23,6 +23,7 @@ namespace Rental4You.Controllers
         {
             SearchViewModel vm = new SearchViewModel();
             DateTime now = DateTime.Now;
+            now = now.AddMinutes(-now.Minute); // para colocar os minutos a 00 na view
             if(now.Hour < 8)
             {
                 var h = 8 - now.Hour;
@@ -36,7 +37,7 @@ namespace Rental4You.Controllers
             {
                 now = now.AddHours(2);
             }
-
+            
             vm.DataLevantamento = now;
             vm.DataEntrega = vm.DataLevantamento.AddHours(24);
             ViewData["Categorias"]= GetFilterCategorias(_context.Categorias.ToList());
@@ -50,19 +51,20 @@ namespace Rental4You.Controllers
             ViewData["pesquisa"] = pesquisa;
             
             ViewData["Empresas"] = GetFilterEmpresas(_context.Empresas.ToList());
-            ViewData["Categorias"] = GetFilterCategorias(_context.Categorias.ToList());;
+            ViewData["Categorias"] = GetFilterCategorias(_context.Categorias.ToList());
             ViewData["Order"] = GetOrders();
 
-            if (pesquisa.Localizacao == null)
+            if (string.IsNullOrWhiteSpace(pesquisa.Localizacao))
             {
-                ViewData["Categorias"] = GetFilterCategorias(_context.Categorias.ToList());;
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("Localizacao", "Necessita indicar uma localização");
+                return View("Index");
             }
             
             var empresasList = _context.Empresas.Where(empresa => empresa.Localidade.Contains(pesquisa.Localizacao)).ToList();
             if (empresasList == null || empresasList.Count() == 0)
             {
-                return View("Search",new List<Veiculo>());
+                ModelState.AddModelError("Localizacao", "Não eximtem empresas registadas na localização indicada");
+                return View("Index");
             }
 
            // ViewData["Empresas"] = new SelectList(empresasList, "Id", "Nome");
@@ -74,7 +76,13 @@ namespace Rental4You.Controllers
             }
             if (pesquisa.DataLevantamento > pesquisa.DataEntrega)
             {
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("DataLevantamento", "A data de levantamento não pode ser maior que a data de entrega");
+                return View("Index");
+            }
+            if(pesquisa.DataLevantamento < DateTime.Now)
+            {
+                ModelState.AddModelError("DataLevantamento", "A data de levantamento não pode ser inferior a data atual");
+                return View("Index");
             }
 
             var veiculos = _context.Veiculos.Include(v => v.Empresa).Include(v => v.Categoria).Where(veiculo => empresas.Contains(veiculo.EmpresaId));
