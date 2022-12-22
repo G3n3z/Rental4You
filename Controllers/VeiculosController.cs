@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Escola_Segura.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -30,6 +31,7 @@ namespace Rental4You.Models
             var OrderList = GetOrder();
             IQueryable<Veiculo>? veiculos = null;
             var model = new List<Veiculo>();
+
             if(User.IsInRole(Roles.Funcionario.ToString()) || User.IsInRole(Roles.Gestor.ToString())){
                 var user = await _userManager.GetUserAsync(User);
                 veiculos = _context.Veiculos.Include(v => v.Categoria).Include(v => v.Empresa)
@@ -66,8 +68,9 @@ namespace Rental4You.Models
 
 
 
-        // GET: Veiculos/Details/5
-        public async Task<IActionResult> Details(int? id)
+		// GET: Veiculos/Details/5
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Veiculos == null)
             {
@@ -87,8 +90,9 @@ namespace Rental4You.Models
             return View(veiculo);
         }
 
-        // GET: Veiculos/Create
-        public IActionResult Create()
+		// GET: Veiculos/Create
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public IActionResult Create()
         {
             ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
             ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
@@ -101,7 +105,8 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo)
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo)
         {
             ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
             ModelState.Remove(nameof(veiculo.Categoria));
@@ -135,8 +140,9 @@ namespace Rental4You.Models
             return View(veiculo);
         }
 
-        // GET: Veiculos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+		// GET: Veiculos/Edit/5
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Veiculos == null)
             {
@@ -160,7 +166,8 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo)
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo)
         {
             if (id != veiculo.Id)
             {
@@ -199,8 +206,9 @@ namespace Rental4You.Models
             return View(veiculo);
         }
 
-        // GET: Veiculos/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+		// GET: Veiculos/Delete/5
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Veiculos == null)
             {
@@ -227,7 +235,8 @@ namespace Rental4You.Models
         // POST: Veiculos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Veiculos == null)
             {

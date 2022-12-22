@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Rental4You.Models
 {
     public enum StatusVeiculo
@@ -9,16 +11,25 @@ namespace Rental4You.Models
     {
         public int Id { get; set; }
         public string Nome { get; set; }
-        public string Descricao { get; set; }
-        public string Localizacao { get; set; }
-        public double CustoDia { get; set; }
-        public bool Disponivel { get; set; }
 
-        // public string Marca {get; set;}
+		[DisplayName("Descrição")]
+		public string Descricao { get; set; }
 
-        // public string Modelo {get; set;}
-        
-        // public string Matricula {get; set;}
+		// public string Marca {get; set;}
+
+		// public string Modelo {get; set;}
+
+		// public string Matricula {get; set;}
+
+		[DisplayName("Localização")]
+		public string Localizacao { get; set; }
+
+        [DisplayName("Custo por dia")]
+		[DataType(DataType.Currency)]
+		public double CustoDia { get; set; }
+
+		[DisplayName("Disponível")]
+		public bool Disponivel { get; set; }
 
         public int EmpresaId { get; set; }
         public Empresa Empresa { get; set; }

@@ -1,60 +1,63 @@
 @model Rental4You.Models.Veiculo
 
 @{
-    ViewData["Title"] = "Details";
+	ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
 
 <div>
-    <h4>Veiculo</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Localizacao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Localizacao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CustoDia)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CustoDia)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Disponivel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Disponivel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Empresa)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Empresa.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Categoria)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Categoria.Id)
-        </dd>
-    </dl>
+	<h4>Veiculo</h4>
+	<hr />
+	<dl class="row">
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Nome)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Nome)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Descricao)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Descricao)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Localizacao)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Localizacao)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.CustoDia)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.CustoDia)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Disponivel)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Disponivel)
+		</dd>
+		@if (!(User.IsInRole("Gestor") || User.IsInRole("Funcionario")))
+		{
+			<dt class="col-sm-2">
+				@Html.DisplayNameFor(model => model.Empresa)
+			</dt>
+			<dd class="col-sm-10">
+				@Html.DisplayFor(model => model.Empresa.Nome)
+			</dd>
+		}
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Categoria)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Categoria.Nome)
+		</dd>
+	</dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn-sm btn-warning">Edit</a> 
-    <a asp-action="Index" class="btn-sm btn-success">Back to List</a>
+	<a asp-action="Edit" asp-route-id="@Model?.Id" class="btn-sm btn-warning">Edit</a>
+	<a asp-action="Index" class="btn-sm btn-success">Back to List</a>
 </div>
