@@ -9,7 +9,6 @@
 
 
 <div class="container mt-3">
-    <div asp-validation-summary="All" class="text-danger"></div>
     <form asp-action="Search" method="get">
        <div class="row">
            <div class="col-4 form-group mb-2">
@@ -32,3 +31,9 @@
        </div>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

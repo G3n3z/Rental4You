@@ -56,15 +56,27 @@ namespace Rental4You.Controllers
 
             if (string.IsNullOrWhiteSpace(pesquisa.Localizacao))
             {
-                ModelState.AddModelError("Localizacao", "Necessita indicar uma localização");
-                return View("Index");
+                ModelState.AddModelError("Localizacao", "Necessita indicar uma localização.");
+                return View("Search", pesquisa);
             }
             
-            var empresasList = _context.Empresas.Where(empresa => empresa.Localidade.Contains(pesquisa.Localizacao)).ToList();
+            var empresasList = _context.Empresas.Where(empresa => empresa.Localidade.Contains(pesquisa.Localizacao)).Include(empresa => empresa.Veiculos).ToList();
             if (empresasList == null || empresasList.Count() == 0)
             {
+                //return NotFound($"Não existem empresas registadas em {pesquisa.Localizacao}! Por favor volte a efetuar a sua pesquisa.");
                 ModelState.AddModelError("Localizacao", "Não eximtem empresas registadas na localização indicada");
-                return View("Index");
+                return View("Search", pesquisa);
+            }
+
+            if (pesquisa.DataLevantamento > pesquisa.DataEntrega)
+            {
+                ModelState.AddModelError("DataLevantamento", "A data de levantamento não pode ser superior à data de entrega");
+                return View("Search", pesquisa);
+            }
+            if(pesquisa.DataLevantamento < DateTime.Now)
+            {
+                ModelState.AddModelError("DataLevantamento", "A data de levantamento não pode ser inferior à data atual");
+                return View("Search", pesquisa);
             }
 
            // ViewData["Empresas"] = new SelectList(empresasList, "Id", "Nome");
@@ -72,19 +84,8 @@ namespace Rental4You.Controllers
 
             if (empresas == null || empresas.Count() == 0)
             {
-                return View("Search", new List<Veiculo>());
+                return View("Search", pesquisa);
             }
-            if (pesquisa.DataLevantamento > pesquisa.DataEntrega)
-            {
-                ModelState.AddModelError("DataLevantamento", "A data de levantamento não pode ser maior que a data de entrega");
-                return View("Index");
-            }
-            if(pesquisa.DataLevantamento < DateTime.Now)
-            {
-                ModelState.AddModelError("DataLevantamento", "A data de levantamento não pode ser inferior a data atual");
-                return View("Index");
-            }
-
             var veiculos = _context.Veiculos.Include(v => v.Empresa).Include(v => v.Categoria).Where(veiculo => empresas.Contains(veiculo.EmpresaId));
 
             veiculos = veiculos.Where(veiculo => veiculo.Reservas == null ||
