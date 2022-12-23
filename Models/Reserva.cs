@@ -20,7 +20,10 @@ namespace Rental4You.Models
         public string ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
+        public int? LevantamentoId { get; set; }
         public Registo? Levantamento { get; set; }
+        
+        public int? EntregaId { get; set; }
         public Registo? Entrega { get; set; }
 
         public Avaliacao? Avaliacao { get; set; }

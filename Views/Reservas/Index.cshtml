@@ -1,3 +1,4 @@
+@using Rental4You.Models
 @model Rental4You.ViewModel.ReservasSearchViewModel
 
 @{
@@ -117,38 +118,48 @@
                         <div class="col-3">
                             <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-success">Details</a>
                         </div>
-                        @if (item.Estado == StatusReserva.pending)
+                        @if (!User.IsInRole("Cliente"))
                         {
-                            <div class="col-3">
-                                <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post">
-                                    <input type="hidden" name="newStatus" value="@StatusReserva.approved" />
-                                    <button type="submit" class="btn btn-success">Aprovar</button>
-                                </form>
-                            </div>
-                            <div class="col-3">
-                                <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post">
-                                    <input type="hidden" name="newStatus" value="@StatusReserva.rejected" />
-                                    <button type="submit" class="btn btn-danger">Rejeitar</button>
-                                </form>
-                            </div>
-                        }
-                        else if (item.Estado == StatusReserva.approved)
-                        {
-                            <div class="col-3">
-                                @if (item.Levantamento == null)
-                                {
-                                    <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-warning">Levantamento</a>
-                                }
-                                else if (item.Entrega == null)
-                                {
-                                    <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-warning">Entrega</a>
-                                }
-                            </div>
+                            @if (item.Estado == StatusReserva.pending)
+                            {
+                                <div class="col-3" style="margin-left: 15px;">
+                                    <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post">
+                                        <input type="hidden" name="newStatus" value="@StatusReserva.approved" />
+                                        <button type="submit" class="btn btn-success">Aprovar</button>
+                                    </form>
+                                </div>
+                                <div class="col-3" style="margin-left: 15px;">
+                                    <form asp-action="ChangeStatus" asp-route-id="@item.ReservaId" method="post">
+                                        <input type="hidden" name="newStatus" value="@StatusReserva.rejected" />
+                                        <button type="submit" class="btn btn-danger">Rejeitar</button>
+                                    </form>
+                                </div>
+                            }
+                            else if (item.Estado == StatusReserva.approved)
+                            {
+                                <div class="col-3" style="margin-left: 15px;">
+                                    @if (item.Levantamento == null)
+                                    {
+                                        <a asp-action="Create" asp-controller="Registos" asp-route-idReserva="@item.ReservaId"
+                                           asp-route-tipo="@RegistoType.LEVANTAMENTO" class="btn btn-warning ml-2">Levantamento</a>
+                                    }
+                                </div>
+                            }
+                            else if (item.Estado == StatusReserva.provided)
+                            {
+                                <div class="col-3" style="margin-left: 15px;">
+                                    @if (item.Entrega == null)
+                                    {
+                                    <a asp-action="Create" asp-controller="Registos" asp-route-idReserva="@item.ReservaId"
+                                       asp-route-tipo="@RegistoType.ENTREGA" class="btn btn-warning ml-2">Entrega</a>
+                                    }
+                                </div>
+                            }
                         }
                     </div>
                 </td>
             </tr>
-        }
+            }
     </tbody>
 </table>
 

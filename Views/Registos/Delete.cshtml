@@ -10,36 +10,64 @@
 <div>
     <h4>Registo</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Data)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Data)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Kms)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Kms)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Danos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Danos)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Observacoes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Observacoes)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+    <div class="row">
+        <div class="col-5">
+            <dl class="row">
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.Data)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Data)
+                </dd>
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.Kms)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Kms)
+                </dd>
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.Danos)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Danos)
+                </dd>
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.Observacoes)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Observacoes)
+                </dd>
+            </dl>
+            
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <input type="submit" value="Delete" class="btn btn-danger" /> |
+                <a asp-action="Index">Back to List</a>
+            </form>
+        </div>
+        <div class="col-7">
+                @if(ViewBag.NFich > 0)
+                {
+                    @foreach(var file in ViewBag.Ficheiros)
+                    {
+                        <div class="row " style="border-radius:10px; border:1px dotted #ccc;">
+                            <a asp-action="deleteImage" asp-route-id="@Model.Id" asp-route-image="@file">
+                                <svg bootstrap-icon="XCircleFill" onclick="return confirm("Tem a certeza que deseja apagar esta foto")"
+                                     class="text-danger" width="24px;" height="24px" arial-label="Trash"></svg>
+
+                            </a>
+                            <img src="@file" class="img-thumbnail" style="max-width:150px; max-height:150px;"/>
+                        </div>
+                    }
+
+
+
+                }
+                else
+                {
+                    <p class="alert text-danger alert-warning"> Ainda não tem imagens associadas</p>
+                }
+
+        </div>
+    </div>
 </div>

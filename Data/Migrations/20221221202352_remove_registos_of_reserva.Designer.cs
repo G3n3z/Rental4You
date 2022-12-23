@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rental4You.Data;
 
@@ -11,9 +12,10 @@ using Rental4You.Data;
 namespace Rental4You.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221221202352_remove_registos_of_reserva")]
+    partial class remove_registos_of_reserva
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -342,17 +344,12 @@ namespace Rental4You.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReservaId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FuncionarioId");
-
-                    b.HasIndex("ReservaId");
 
                     b.ToTable("Registos");
                 });
@@ -381,13 +378,7 @@ namespace Rental4You.Data.Migrations
                     b.Property<DateTime>("DataLevantamento")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EntregaId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Estado")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LevantamentoId")
                         .HasColumnType("int");
 
                     b.Property<int>("VeiculoId")
@@ -396,14 +387,6 @@ namespace Rental4You.Data.Migrations
                     b.HasKey("ReservaId");
 
                     b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("EntregaId")
-                        .IsUnique()
-                        .HasFilter("[EntregaId] IS NOT NULL");
-
-                    b.HasIndex("LevantamentoId")
-                        .IsUnique()
-                        .HasFilter("[LevantamentoId] IS NOT NULL");
 
                     b.HasIndex("VeiculoId");
 
@@ -536,15 +519,7 @@ namespace Rental4You.Data.Migrations
                         .WithMany("Registos")
                         .HasForeignKey("FuncionarioId");
 
-                    b.HasOne("Rental4You.Models.Reserva", "Reserva")
-                        .WithMany()
-                        .HasForeignKey("ReservaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Funcionario");
-
-                    b.Navigation("Reserva");
                 });
 
             modelBuilder.Entity("Rental4You.Models.Reserva", b =>
@@ -555,14 +530,6 @@ namespace Rental4You.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Rental4You.Models.Registo", "Entrega")
-                        .WithOne()
-                        .HasForeignKey("Rental4You.Models.Reserva", "EntregaId");
-
-                    b.HasOne("Rental4You.Models.Registo", "Levantamento")
-                        .WithOne()
-                        .HasForeignKey("Rental4You.Models.Reserva", "LevantamentoId");
-
                     b.HasOne("Rental4You.Models.Veiculo", "Veiculo")
                         .WithMany("Reservas")
                         .HasForeignKey("VeiculoId")
@@ -570,10 +537,6 @@ namespace Rental4You.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("Entrega");
-
-                    b.Navigation("Levantamento");
 
                     b.Navigation("Veiculo");
                 });

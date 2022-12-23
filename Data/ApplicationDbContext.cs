@@ -25,7 +25,16 @@ namespace Rental4You.Data
             modelBuilder.Entity<Avaliacao>()
                 .HasOne(p => p.Reserva)
                 .WithOne(b => b.Avaliacao).OnDelete(DeleteBehavior.ClientCascade); 
-        }
+
+            modelBuilder.Entity<Reserva>()
+            .HasOne(s => s.Levantamento) // Mark Address property optional in Student entity
+            .WithOne()
+            .HasForeignKey<Reserva>(ars => ars.LevantamentoId);
+
+            modelBuilder.Entity<Reserva>()
+            .HasOne(s => s.Entrega).WithOne()
+            .HasForeignKey<Reserva>(ars => ars.EntregaId);
+    }
     }
 
 }

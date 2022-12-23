@@ -84,6 +84,12 @@
 </div>
 <div>
     <a asp-action="Index" class="btn-sm btn-warning">Back to List</a>
+    @if(Model != null && Model.LevantamentoId != null){
+        <a asp-action="Details" asp-controller="Registos" asp-route-id="@Model.LevantamentoId" class="btn-sm btn-warning">Ver Levantamento</a>
+    }
+    @if(Model != null && Model.EntregaId != null){
+        <a asp-action="Details" asp-controller="Registos" asp-route-id="@Model.EntregaId" class="btn-sm btn-warning">Ver Entrega</a>
+    }
 </div>
 
 

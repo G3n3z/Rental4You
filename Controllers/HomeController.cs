@@ -62,7 +62,8 @@ namespace Rental4You.Controllers
             var empresasList = _context.Empresas.Where(empresa => empresa.Localidade.Contains(pesquisa.Localizacao)).ToList();
             if (empresasList == null || empresasList.Count() == 0)
             {
-                return View("Search",new List<Veiculo>());
+                pesquisa.Veiculos = new List<SearchVeiculosViewModel>();
+                return View("Search", pesquisa);
             }
 
            // ViewData["Empresas"] = new SelectList(empresasList, "Id", "Nome");
@@ -79,12 +80,19 @@ namespace Rental4You.Controllers
 
             var veiculos = _context.Veiculos.Include(v => v.Empresa).Include(v => v.Categoria).Where(veiculo => empresas.Contains(veiculo.EmpresaId));
 
-            veiculos = veiculos.Where(veiculo => veiculo.Reservas == null ||
+            veiculos = veiculos.Include(v => v.Reservas)
+                                        .Where(veiculo => veiculo.Reservas == null ||
                                                   veiculo.Reservas.Count() == 0 ||
                                                   veiculo.Reservas.Where(reserva =>
-                                                      (reserva.DataLevantamento < pesquisa.DataLevantamento && reserva.DataEntrega > pesquisa.DataLevantamento) ||
-                                                       (reserva.DataLevantamento < pesquisa.DataEntrega && reserva.DataEntrega > pesquisa.DataEntrega)
-                                                    ).Count() >= 0);
+                                                        //     13-12-2022 < 19-12-2022      &&   20-12-2022 < 24-12-2022  1-1
+                                                        (pesquisa.DataLevantamento < reserva.DataLevantamento && reserva.DataEntrega < pesquisa.DataEntrega) ||
+                                                        //     18-12-2022 < 19-12-2022      &&   18-12-2022 < 19-12-2022 1-1
+                                                        (pesquisa.DataLevantamento < reserva.DataLevantamento && reserva.DataLevantamento < pesquisa.DataEntrega) ||
+                                                       //     19-12-2022 < 20-12-2022      &&   20-12-2022 < 24-12-2022 1-1
+                                                       (pesquisa.DataLevantamento < reserva.DataEntrega && reserva.DataEntrega < pesquisa.DataEntrega) ||
+                                                       //     19-12-2022 11:00 > 19-12-2022 10:00     &&   20-12-2022 11:00 > 20-12-2022 10:00 1-1
+                                                       (pesquisa.DataLevantamento > reserva.DataLevantamento && reserva.DataEntrega > pesquisa.DataEntrega)
+                                                    ).Count() == 0);
             var aux = veiculos.ToList();
             if(pesquisa.FiltroCategoria != null)
             {
