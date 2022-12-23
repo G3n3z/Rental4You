@@ -152,48 +152,7 @@ namespace Rental4You.Models
 
             return View(await resultado.Include(e => e.Veiculos).AsNoTracking().ToListAsync());
         }
-        /*
-        [HttpPost]
-        public async Task<IActionResult> Index(string sortOrder, string TextoAPesquisar, string Localidade, string Subscricao)
-        {
-            SelectList listLocalidades = new SelectList(_context.Empresas.Select(x => x.Localidade).ToList().Distinct());
-            foreach (var item in listLocalidades)
-            {
-                if (item.Text == Localidade)
-                    item.Selected = true;
-            }
-            var listSubscricoes = GetSubscricao();
-            foreach (var item in listSubscricoes)
-            {
-                if (item.Value == Subscricao)
-                    item.Selected = true;
-            }
-
-            ViewData["ListaDeLocalidades"] = listLocalidades;
-            ViewData["Subscricao"] = listSubscricoes;
-            
-            var estadoSubscricao = Subscricao.Equals("true") ? true : false;
-
-            IQueryable<Empresa> resultado;
-
-            if (string.IsNullOrWhiteSpace(TextoAPesquisar))
-            {
-                ViewData["TextoPesquisa"] = "";
-                resultado = from c in _context.Empresas
-                                where c.Localidade == Localidade && c.Activo == estadoSubscricao
-                                select c;
-            }
-            else
-            {
-                ViewData["TextoPesquisa"] = TextoAPesquisar;
-                resultado = from c in _context.Empresas
-                                where c.Nome.Contains(TextoAPesquisar) && c.Localidade == Localidade && c.Activo == estadoSubscricao
-                                select c;
-            }
-
-            return View(resultado);
-        }
-        */
+        
         // GET: Empresas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -325,14 +284,18 @@ namespace Rental4You.Models
             }
 
             var empresa = await _context.Empresas
+                .Include(e => e.Veiculos)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (empresa == null)
             {
                 return NotFound();
             }
-            
+			if (empresa.Veiculos != null)
+            {
+                return BadRequest();
+            }
 
-            return View(empresa);
+			return View(empresa);
         }
 
         // POST: Empresas/Delete/5
