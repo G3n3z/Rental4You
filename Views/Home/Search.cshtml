@@ -8,12 +8,14 @@
         <div class="row">
             <div class="col-4 form-group mb-2">
                 <input type="text" asp-for="Localizacao"  placeholder="Localização" class="form-control" />
+                <span asp-validation-for="Localizacao" class="text-danger"></span>
             </div>
             <div class="col-4 form-group mb-2">
-                <input asp-for="DataLevantamento" class="form-control" />
+                <input asp-for="DataLevantamento" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+                <span asp-validation-for="DataLevantamento" class="text-danger"></span>
             </div>
             <div class="col-4 form-group mb-2">
-                <input asp-for="DataEntrega" class="form-control" />
+                <input asp-for="DataEntrega" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}"/>
             </div>
             
         </div>
@@ -45,48 +47,45 @@
     </form>
 </div>
 
-<div class="list-group"></div>
-@foreach(var veiculo in Model.Veiculos)
-{
-    <div class="list-group-item list-group-item-action flex-column align-items-start" >
-        <div class="row">
-            <div class="col-4">
-                PHOTO
-            </div>
-            <div class="col-2">
-                <div>@veiculo.Veiculo.Nome</div>
-                <div>@veiculo.Veiculo.Descricao</div>
+@if(Model.Veiculos != null){
+    <div class="list-group"></div>
+    @foreach(var veiculo in Model.Veiculos)
+    {
+        <div class="list-group-item list-group-item-action flex-column align-items-start" >
+            <div class="row">
+                <div class="col-4">
+                    PHOTO
+                </div>
+                <div class="col-2">
+                    <div>@veiculo.Veiculo.Nome</div>
+                    <div>@veiculo.Veiculo.Descricao</div>
 
-            </div>
-            <div class="col-2">
-                <div>
-                    <label>Preco:</label>
-                    <label>@veiculo.Veiculo.CustoDia€/Dia </label>
                 </div>
-                <div>Empresa: @veiculo.Empresa.Nome</div>
-            </div>
-            <div class="col-2">
-                <div>
-                    <label>Preço Total: </label>
-                    <label>@veiculo.Preco€</label>
+                <div class="col-2">
+                    <div>
+                        <label>Preco:</label>
+                        <label>@veiculo.Veiculo.CustoDia€/Dia </label>
+                    </div>
+                    <div>Empresa: @veiculo.Empresa.Nome</div>
                 </div>
-            </div>
-            <div class="col-2">
-                <form asp-controller="Reservas" asp-action="NovaReserva" method="post">
-                    <input type="hidden" name="idVeiculo" value="@veiculo.Veiculo.Id" />
-                    <input type="hidden" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento" />
-                    <input type="hidden" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" />
-                    <button type="submit" class="btn btn-success">Reservar</button>
-                </form>
+                <div class="col-2">
+                    <div>
+                        <label>Preço Total: </label>
+                        <label>@veiculo.Preco€</label>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <form asp-controller="Reservas" asp-action="NovaReserva" method="post">
+                        <input type="hidden" name="idVeiculo" value="@veiculo.Veiculo.Id" />
+                        <input type="hidden" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento" />
+                        <input type="hidden" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" />
+                        <button type="submit" class="btn btn-success">Reservar</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    }
 }
-
-
-
-
-
 
 <nav aria-label="Page navigation example">
     <ul class="pagination">
