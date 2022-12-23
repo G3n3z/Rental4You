@@ -3,7 +3,10 @@
     ViewData["Title"] = "Novo Utilizador";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<h1>Novo</h1>
 
+<h4>Utilizador</h4>
+<hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
@@ -37,8 +40,10 @@
                 <label class="control-label"> Role</label>
                 <select class="form-control" name="role" asp-items="ViewBag.Roles"></select>
             </div>
+            <br />
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Criar" class="btn btn-primary btn-sm" />
+                <a asp-action="Index" class="btn btn-secondary btn-sm">Voltar à Lista</a>
             </div>
         </form>
     </div>

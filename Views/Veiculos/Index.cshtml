@@ -1,99 +1,122 @@
 @model IEnumerable<Rental4You.Models.Veiculo>
 
 @{
-    ViewData["Title"] = "Index";
+	ViewData["Title"] = "Index";
 }
 
 @if (User.IsInRole("Admin"))
 {
-    <h1>Veiculos</h1>
-}else{
-    <h1>Frota</h1>
+	<h1>Veiculos</h1>
 }
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</p>
-
+else
+{
+	<h1>Frota</h1>
+}
+@if (User.IsInRole("Gestor") || User.IsInRole("Funcionario"))
+{
+	<p>
+		<a asp-action="Create" class="btn btn-primary">Adicionar Veículo</a>
+	</p>
+}
+<hr />
 <form asp-action="Index" method="get" class="container">
-    <div class="row">
-        <div class="col-3 mb-2">
-            <label>Categorias</label>
-            <select name="Categoria" asp-items=@ViewBag.Categorias class="custom-select mb-2"></select>
-        </div>
-        <div class="col-3 form-group mb-2">
-            <label>Estado</label>
-            <select name="statusVeiculo" asp-items=@ViewBag.Estado class="form-group"></select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-3 form-group mb-2">
-            <label>Ordenar por:</label>
-            <select name="order" asp-items=@ViewBag.Order class="form-group"></select>
-        </div>
-        <div class="col-3 form-group mb-2">
-            <button type="submit" class="btn btn-success">Pesquisar</button>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-3 mb-2">
+			<label>Categorias:</label>
+			<select name="Categoria" asp-items=@ViewBag.Categorias class="custom-select mb-2"></select>
+		</div>
+		<div class="col-3 form-group mb-2">
+			<label>Estado:</label>
+			<select name="statusVeiculo" asp-items=@ViewBag.Estado class="form-group"></select>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-3 form-group mb-2">
+			<label>Ordenar por:</label>
+			<select name="order" asp-items=@ViewBag.Order class="form-group"></select>
+		</div>
+		<div class="col-3 form-group mb-2">
+			<button type="submit" class="btn btn-success btn-sm">Pesquisar</button>
+		</div>
+	</div>
 </form>
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Localizacao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustoDia)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Disponivel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Empresa)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoria)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Localizacao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustoDia)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Disponivel)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Empresa.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoria.Nome)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn-sm btn-warning">Edit</a> 
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn-sm btn-success">Details</a> 
-                @if(item.Reservas == null || item.Reservas.Count() == 0){
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn-sm btn-danger">Delete</a>
-                }
-            </td>
-        </tr>
-}
-    </tbody>
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.Nome)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Descricao)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Localizacao)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.CustoDia)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Disponivel)
+			</th>
+			@if (User.IsInRole("Admin"))
+			{
+				<th>
+					@Html.DisplayNameFor(model => model.Empresa)
+				</th>
+			}
+			<th>
+				@Html.DisplayNameFor(model => model.Categoria)
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Nome)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Descricao)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Localizacao)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.CustoDia)
+				</td>
+				<td>
+					@if(item.Disponivel == true)
+					{
+						@ViewBag.Estado[1].Text
+					}
+					else
+					{
+						@ViewBag.Estado[2].Text
+					}
+				</td>
+				@if (User.IsInRole("Admin"))
+				{
+					<td>
+						@Html.DisplayFor(modelItem => item.Empresa.Nome)
+					</td>
+				}
+				<td>
+					@Html.DisplayFor(modelItem => item.Categoria.Nome)
+				</td>
+				@if (User.IsInRole("Gestor") || User.IsInRole("Funcionario"))
+				{
+					<td>
+						<a asp-action="Details" asp-route-id="@item.Id" class="btn-sm btn-success btn-sm">Detalhes</a>
+						<a asp-action="Edit" asp-route-id="@item.Id" class="btn-sm btn-warning btn-sm">Editar</a>
+						@if (item.Reservas == null || item.Reservas.Count() == 0)
+						{
+							<a asp-action="Delete" asp-route-id="@item.Id" class="btn-sm btn-danger btn-sm">Remover</a>
+						}
+					</td>
+				}
+			</tr>
+		}
+	</tbody>
 </table>

@@ -1,5 +1,6 @@
-﻿using System;
-using Rental4You.Models;
+﻿using Rental4You.Models;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Rental4You.ViewModel
 {
@@ -9,10 +10,20 @@ namespace Rental4You.ViewModel
         {
         }
         public string UserId { get; set; }
+
+        [DisplayName("Primeiro Nome")]
         public string PrimeiroNome { get; set; }
+
+        [DisplayName("Último Nome")]
         public string UltimoNome { get; set; }
+
+        [Required(ErrorMessage = "Necessita indicar o Email")]
         public string Email { get; set; }
+
+        [DisplayName("Role")]
         public IEnumerable<string> Roles { get; set; }
+        
+        [DisplayName("Estado")]
         public Boolean IsActive { get; set; }
         public Boolean HaveRegister { get; set; }
 

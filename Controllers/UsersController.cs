@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Escola_Segura.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -53,7 +54,7 @@ namespace Rental4You.Controllers
             return View(viewModel);
         }
 
-
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Create()
         {
             List<IdentityRole> roles = _roleManager.Roles.Where(r => r.Name == Roles.Gestor.ToString() || r.Name == Roles.Funcionario.ToString()).ToList();
@@ -64,9 +65,15 @@ namespace Rental4You.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Create([Bind("Id,PrimeiroNome,UltimoNome,DataNascimento,Email,NIF,EmpresaId")] ApplicationUser user, string role)
         {
+            if (user.DataNascimento >= DateTime.Today)
+            {
+                ModelState.AddModelError("DataNascimento", "A data de nascimento não pode ser igual ou superior à data atual");
 
+                return View(user);
+            }
             user.Active = true;
             ModelState.Remove(nameof(user.Empresa));
             ModelState.Remove(nameof(user.Reservas));
@@ -108,8 +115,8 @@ namespace Rental4You.Controllers
         }
 
 
-
-        public async Task<IActionResult> Edit(string UserId)
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Edit(string UserId)
         {
             if (String.IsNullOrEmpty(UserId))
             {
@@ -144,7 +151,8 @@ namespace Rental4You.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UserDetailsViewModel userDetails, string userId)
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Edit(UserDetailsViewModel userDetails, string userId)
         {
             if (String.IsNullOrEmpty(userId))
             {
@@ -152,11 +160,17 @@ namespace Rental4You.Controllers
 
             }
 
+            if(userDetails.DataNascimento >= DateTime.Today)
+            {
+                ModelState.AddModelError("DataNascimento", "A data de nascimento não pode ser igual ou superior à data atual");
+            }
+
             ModelState.Remove(nameof(userDetails.roles));
             ApplicationUser user = _userManager.FindByIdAsync(userId).Result;
             user.UserName = user.Email;
             if (!ModelState.IsValid)
             {
+                userDetails.Id = user.Id;
                 return View(userDetails);
             }
 
@@ -204,15 +218,21 @@ namespace Rental4You.Controllers
             return RedirectToAction("Index");
         }
 
-
-        public async Task<IActionResult> Delete(string userId)
+		[Authorize(Roles = "Gestor")]
+		public async Task<IActionResult> Delete(string userId)
         {
             if (userId == null || _context.Users == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.Users
+			ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            if(applicationUser == null || applicationUser.Id == userId)
+            {
+                return BadRequest();
+            }
+
+			var user = await _context.Users
                 .FirstOrDefaultAsync(m => m.Id == userId);
             if (user == null)
             {
@@ -225,7 +245,8 @@ namespace Rental4You.Controllers
         // POST: Reservas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string Id)
+		[Authorize(Roles = "Gestor")]
+		public async Task<IActionResult> DeleteConfirmed(string Id)
         {
             if (_context.Users == null)
             {

@@ -284,14 +284,18 @@ namespace Rental4You.Models
             }
 
             var empresa = await _context.Empresas
+                .Include(e => e.Veiculos)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (empresa == null)
             {
                 return NotFound();
             }
-            
+			if (empresa.Veiculos != null)
+            {
+                return BadRequest();
+            }
 
-            return View(empresa);
+			return View(empresa);
         }
 
         // POST: Empresas/Delete/5

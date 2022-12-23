@@ -4,8 +4,9 @@
 
 }
 
-<h1>@Model.PrimeiroNome @Model.UltimoNome</h1>
-
+<h1>Editar</h1>
+<h4>@Model.PrimeiroNome @Model.UltimoNome</h4>
+<hr />
 
 <div class="row">
     <div class="col-md-4">
@@ -52,8 +53,10 @@
                 <label class="control-label"> Activo </label>
                 <input type="checkbox" asp-for="Active"/>
             </div>
+            <br />
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Guardar" class="btn btn-primary btn-sm" />
+                <a asp-action="Index" class="btn btn-secondary btn-sm">Voltar à Lista</a>
             </div>
         </form>
     </div>

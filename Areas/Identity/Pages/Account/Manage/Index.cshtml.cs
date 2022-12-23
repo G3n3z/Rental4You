@@ -60,7 +60,7 @@ namespace Rental4You.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Primeiro Nome")]
             public string PrimeiroNome { get; set; }
 
-            [Display(Name = "Ultimo Nome")]
+            [Display(Name = "Último Nome")]
             public string UltimoNome { get; set; }
 
             [Display(Name = "Data de Nascimento")]
