@@ -18,11 +18,11 @@
 		</dd>
 	</dl>
 </div>
+<br />
 <div>
 	@if (User.IsInRole("Admin"))
 	{
-		<a asp-action="Edit" asp-route-id="@Model?.Id">Editar</a>
-		<label> | </label>
+		<a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning btn-sm">Editar</a>
 	}
-	<a asp-action="Index">Voltar à lista</a>
+	<a asp-action="Index" class="btn btn-secondary btn-sm">Voltar à Lista</a>
 </div>

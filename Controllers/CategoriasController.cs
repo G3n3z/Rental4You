@@ -133,13 +133,14 @@ namespace Rental4You.Models
 				return NotFound();
 			}
 
-			var categoria = await _context.Categorias.Include(c => c.Veiculos)
+			var categoria = await _context.Categorias
+				.Include(m => m.Veiculos)
 				.FirstOrDefaultAsync(m => m.Id == id);
 			if (categoria == null)
 			{
 				return NotFound();
 			}
-			if (categoria.Veiculos != null)
+			if (categoria.Veiculos != null && categoria.Veiculos.Count() != 0)
 			{
 				return BadRequest();
 			}
