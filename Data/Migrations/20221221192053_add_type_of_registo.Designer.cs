@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rental4You.Data;
 
@@ -11,9 +12,10 @@ using Rental4You.Data;
 namespace Rental4You.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221221192053_add_type_of_registo")]
+    partial class add_type_of_registo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -342,17 +344,12 @@ namespace Rental4You.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReservaId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FuncionarioId");
-
-                    b.HasIndex("ReservaId");
 
                     b.ToTable("Registos");
                 });
@@ -397,13 +394,9 @@ namespace Rental4You.Data.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("EntregaId")
-                        .IsUnique()
-                        .HasFilter("[EntregaId] IS NOT NULL");
+                    b.HasIndex("EntregaId");
 
-                    b.HasIndex("LevantamentoId")
-                        .IsUnique()
-                        .HasFilter("[LevantamentoId] IS NOT NULL");
+                    b.HasIndex("LevantamentoId");
 
                     b.HasIndex("VeiculoId");
 
@@ -536,15 +529,7 @@ namespace Rental4You.Data.Migrations
                         .WithMany("Registos")
                         .HasForeignKey("FuncionarioId");
 
-                    b.HasOne("Rental4You.Models.Reserva", "Reserva")
-                        .WithMany()
-                        .HasForeignKey("ReservaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Funcionario");
-
-                    b.Navigation("Reserva");
                 });
 
             modelBuilder.Entity("Rental4You.Models.Reserva", b =>
@@ -556,12 +541,12 @@ namespace Rental4You.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Rental4You.Models.Registo", "Entrega")
-                        .WithOne()
-                        .HasForeignKey("Rental4You.Models.Reserva", "EntregaId");
+                        .WithMany()
+                        .HasForeignKey("EntregaId");
 
                     b.HasOne("Rental4You.Models.Registo", "Levantamento")
-                        .WithOne()
-                        .HasForeignKey("Rental4You.Models.Reserva", "LevantamentoId");
+                        .WithMany()
+                        .HasForeignKey("LevantamentoId");
 
                     b.HasOne("Rental4You.Models.Veiculo", "Veiculo")
                         .WithMany("Reservas")

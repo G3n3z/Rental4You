@@ -1,17 +1,22 @@
+@using Rental4You.Models
 @model Rental4You.Models.Registo
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Registo</h4>
+@if(Model.Tipo == RegistoType.LEVANTAMENTO){
+    <h4>Levantamento</h4>
+}else{
+    <h4>Entrega</h4>
+}
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ReservaId"/>
+            <input type="hidden" id="type" asp-for="Tipo"/>
             <div class="form-group">
                 <label asp-for="Data" class="control-label"></label>
                 <input asp-for="Data" class="form-control" />
@@ -24,12 +29,30 @@
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Danos" /> @Html.DisplayNameFor(model => model.Danos)
+                    <input id="danos" class="form-check-input" asp-for="Danos" /> @Html.DisplayNameFor(model => model.Danos)
                 </label>
             </div>
+            
+            <div id="ImagesInput" style=" display: none;" class="col-md-8">
+                <p>Adicionar Imagens</p>
+                <div class="col-4" id="ImagesColumns">
+                    <div class="">
+                       <img id="NovaIMG" class="img-thumbnail" src="" />
+                    </div>
+                </div>
+            
+                <div class="form-group">
+                    <input type="file" name="ficheiros" id="ficheiros" multiple
+                           accept=".png,.jpg,image/png,image/jpeg"
+                           class="form-control"
+                           style="border: 0px!important; padding: 0p;padding-top: 10px; padding-bottom: 30px;"
+                           onchange="updateImages(this.files)" />
+                </div>
+            </div>
+
             <div class="form-group">
                 <label asp-for="Observacoes" class="control-label"></label>
-                <input asp-for="Observacoes" class="form-control" />
+                <textarea asp-for="Observacoes" class="form-control" ></textarea>
                 <span asp-validation-for="Observacoes" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -37,6 +60,18 @@
             </div>
         </form>
     </div>
+    <div class="col-4" id="ImagesUpdated">
+        <div class="">
+            <img id="NovaIMG" class="img-thumbnail" src="" />
+        </div>
+    </div>
+    <div class="col-4" id="ImagesColumns">
+        <div class="">
+                <img id="NovaIMG" class="img-thumbnail" src="" />
+        </div>
+    </div>
+    
+        
 </div>
 
 <div>
@@ -45,4 +80,56 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        var checkbox = document.getElementById("danos");
+        var type = document.getElementById("type");
+        
+        var imageInput = document.getElementById("ImagesInput");
+        checkbox.addEventListener('change', function() {
+            
+            if("@Model.Tipo" ==  "@RegistoType.ENTREGA.ToString()"){
+                if (this.checked) {
+                    imageInput.style="display: block;"
+                } else {
+                    imageInput.style="display: none;"
+                    imageInput.value="";
+                }
+            }
+            
+        });
+
+        function updateImages(img){
+            console.log(img)
+            
+            deleteChild()
+            let i = 0;
+            while(i < img.length){
+                let url = window.URL.createObjectURL(img[i]);    
+                console.log(url)
+                let div = document.createElement("div");
+                div.classList.add("image_input");
+                let image = document.createElement("img");
+                image.style="max-width:240px;max-height:120px;"
+                image.src = url;
+                div.appendChild(image);
+                let imgsDiv = document.getElementById('ImagesColumns');
+                imgsDiv.appendChild(div);  
+                i++;
+            }
+        }
+
+        function deleteChild() {
+            
+            let imgsDiv = document.getElementById('ImagesColumns');
+            var child = imgsDiv.lastElementChild; 
+            while (child) {
+                imgsDiv.removeChild(child);
+                child = imgsDiv.lastElementChild;
+            }
+        }
+    
+
+
+    </script>
 }

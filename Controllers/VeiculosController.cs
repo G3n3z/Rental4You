@@ -43,9 +43,12 @@ namespace Rental4You.Models
                 filtrosCategorias = SelectListItem(Categoria, filtrosCategorias);
             }
             if(veiculos != null && statusVeiculo != null){
-                if(statusVeiculo == StatusVeiculo.A_CIRCULAR){
+                if (statusVeiculo == StatusVeiculo.A_CIRCULAR)
+                {
                     veiculos = veiculos.Where(v => v.Reservas.Where(r => r.Levantamento != null && r.Entrega == null).Count() > 0);
-                }else if(statusVeiculo == StatusVeiculo.DISPONIVEL){
+                }
+                else if (statusVeiculo == StatusVeiculo.DISPONIVEL)
+                {
                     veiculos = veiculos.Where(v => v.Reservas.Where(r => r.Levantamento != null).Count() == 0);
                 }
                 filtrosEstado = SelectListItem(statusVeiculo.ToString(), filtrosEstado);

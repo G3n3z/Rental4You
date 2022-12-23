@@ -37,7 +37,9 @@ namespace Rental4You.Models
             }
             if (User.IsInRole("Cliente"))
             {
-                reservas = _context.Reservas.Include(r => r.ApplicationUser).Where(r => r.ApplicationUserId == user.Id)
+                reservas = _context.Reservas.Include(r => r.ApplicationUser).Include(r => r.Avaliacao).
+                    Include(r => r.Veiculo)
+                    .Where(r => r.ApplicationUserId == user.Id)
                     .OrderByDescending(r => r.DataLevantamento)
                     .ThenByDescending(r => r.CustoTotal);
                 
@@ -165,6 +167,7 @@ namespace Rental4You.Models
             ModelState.Remove(nameof(reserva.ApplicationUserId));
 
             reserva.Concluido = false;
+            reserva.Estado = StatusReserva.pending;
             var user = await _userManager.GetUserAsync(User);
             if(user == null)
             {
