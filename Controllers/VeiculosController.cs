@@ -225,7 +225,7 @@ namespace Rental4You.Models
                 return NotFound();
             }
 
-            if(veiculo.Reservas != null && veiculo.Reservas.Count() >= 0){
+            if(veiculo.Reservas != null && veiculo.Reservas.Count() > 0){
                 return RedirectToAction(nameof(Index));
             }
 
@@ -248,7 +248,7 @@ namespace Rental4You.Models
                 _context.Veiculos.Remove(veiculo);
             }
             
-            if(veiculo.Reservas != null && veiculo.Reservas.Count() >= 0){
+            if(veiculo.Reservas != null && veiculo.Reservas.Count() > 0){
                 return RedirectToAction(nameof(Index));
             }
             
@@ -270,7 +270,7 @@ namespace Rental4You.Models
         {
             return  new SelectListItem[]{
                 new SelectListItem() { Text = " ", Value = string.Empty },
-                new SelectListItem() { Text = "Disponivel", Value = StatusVeiculo.DISPONIVEL.ToString() },
+                new SelectListItem() { Text = "Disponível", Value = StatusVeiculo.DISPONIVEL.ToString() },
                 new SelectListItem() { Text = "A Circular", Value = StatusVeiculo.A_CIRCULAR.ToString() }
             };
         }
