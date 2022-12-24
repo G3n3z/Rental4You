@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -359,7 +360,48 @@ namespace Rental4You.Models
 
         }
 
-        private IEnumerable<SelectListItem> GetCategoria(List<Categoria> categorias)
+		public async Task<IActionResult> GraficoReservasDiarias()
+		{
+			return View();
+		}
+
+        [HttpPost]
+        public async Task<IActionResult> GetDadosReservasDiarias()
+        {
+			//dados de exemplo
+			List<object> dados = new List<object>();
+			DataTable dt = new DataTable();
+			dt.Columns.Add("Reservas", Type.GetType("System.String"));
+			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
+
+            var dadosReservas = await _context.Reservas
+                .Where(r => r.DataLevantamento >= DateTime.Now.AddDays(-30))
+                .GroupBy(r => r.DataLevantamento)
+                .Select(r => new
+                {
+                    Data = r.Key,
+                    Qtd = r.Count()
+                })
+                .ToListAsync();
+            DataRow dr;
+			foreach(var reserva in dadosReservas)
+            {
+				dr = dt.NewRow();
+				dr["Reservas"] = reserva.Data;
+                dr["Quantidade"] = reserva.Qtd;
+                dt.Rows.Add(dr);
+            }
+
+			foreach (DataColumn dc in dt.Columns)
+			{
+				List<object> x = new List<object>();
+				x = (from DataRow drr in dt.Rows select drr[dc.ColumnName]).ToList();
+				dados.Add(x);
+			}
+			return Json(dados);
+		}
+
+			private IEnumerable<SelectListItem> GetCategoria(List<Categoria> categorias)
         {
             var filter = categorias.Select(categoria => categoria.Nome).Distinct().ToArray();
             var items = new SelectListItem[filter.Count() + 1];
