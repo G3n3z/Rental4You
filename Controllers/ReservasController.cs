@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -24,6 +25,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas
+        [Authorize(Roles = "Admin,Gestor,Funcionario")]
         public async Task<IActionResult> Index([Bind("DataLevantamento,DataEntrega,NomeCliente,Veiculo,Estado, Categoria, order")]ReservasSearchViewModel viewModel )
         {
             var EstadoList = GetEstado();
@@ -49,7 +51,15 @@ namespace Rental4You.Models
                 reservas = _context.Reservas.Include(r => r.ApplicationUser).Include(r => r.Veiculo)
                     .Include(r => r.Avaliacao)
                     .Where(r => r.Veiculo.EmpresaId == user.EmpresaId);
-                
+
+            }
+            else if (User.IsInRole("Admin"))
+            {
+                reservas = _context.Reservas.Include(r => r.ApplicationUser).Include(r => r.Veiculo)
+                   .Include(r => r.Avaliacao);
+            }
+            else{
+                return Unauthorized();
             }
             if(reservas != null && viewModel.DataLevantamento != null){
                 reservas = reservas.Where(r => r.DataLevantamento >= viewModel.DataLevantamento.Value);
@@ -95,6 +105,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas/Details/5
+        [Authorize(Roles = "Admin,Gestor,Funcionario")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Reservas == null)
@@ -116,6 +127,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas/Create
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Create(int? idVeiculo, DateTime datalevantamento, DateTime dataentrega)
         {
             if (idVeiculo == null)
@@ -151,6 +163,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Create([Bind("DataLevantamento,DataEntrega,CustoTotal,VeiculoId")] Reserva reserva)
         {
 
@@ -189,6 +202,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas/Edit/5
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Reservas == null)
@@ -211,6 +225,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Edit(int id, [Bind("ReservaId,Concluido,VeiculoId,ApplicationUserId")] Reserva reserva)
         {
             if (id != reserva.ReservaId)
@@ -244,6 +259,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas/Delete/5
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Reservas == null)
@@ -266,6 +282,7 @@ namespace Rental4You.Models
         // POST: Reservas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Reservas == null)
@@ -283,6 +300,7 @@ namespace Rental4You.Models
         }
 
         [HttpPost]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> NovaReserva(int? idVeiculo, DateTime DataLevantamento, DateTime DataEntrega)
         {
             if (idVeiculo == null)
@@ -316,6 +334,7 @@ namespace Rental4You.Models
 
         
         [HttpPost]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> ChangeStatus(StatusReserva? newStatus, int? id){
             if(id == null || newStatus == null){
                 return RedirectToAction(nameof(Index));
@@ -325,6 +344,10 @@ namespace Rental4You.Models
                 return NotFound();
             }
             if(reserva.Estado != StatusReserva.pending){
+                return RedirectToAction(nameof(Index));
+            }
+            if (newStatus != StatusReserva.approved || newStatus != StatusReserva.rejected)
+            {
                 return RedirectToAction(nameof(Index));
             }
             reserva.Estado = (StatusReserva)newStatus;

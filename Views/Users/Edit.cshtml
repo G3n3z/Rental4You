@@ -42,7 +42,7 @@
                     <div class="form-check">
                         <input type="hidden" asp-for="@Model.roles[i].RoleId" />
                         <input type="hidden" asp-for="@Model.roles[i].RoleName" />
-                        <input asp-for="@Model.roles[i].Selected" />
+                        <input id="input_@i" class="input_role" asp-for="@Model.roles[i].Selected" />
                         <label class="form-check-label" asp-for="@Model.roles[i].Selected">
                             @Model.roles[i].RoleName
                         </label>
@@ -62,3 +62,23 @@
     </div>
 </div>
 
+<script>
+
+    var inputs = document.querySelectorAll(".input_role");
+    for(let i = 0; i< inputs.length; i++){
+        inputs[i].addEventListener('click', function(event){
+            if(event.target.checked){
+                cleanValue(event.target.id);
+            }
+        });
+    }
+
+    function cleanValue(id_not_clean){
+        for(let i = 0; i< inputs.length; i++){
+            if(inputs[i].id != id_not_clean){
+                inputs[i].checked = false;
+            }
+        }
+    }
+
+</script>

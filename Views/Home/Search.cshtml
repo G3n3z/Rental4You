@@ -66,22 +66,28 @@
                         <label>Preco:</label>
                         <label>@veiculo.Veiculo.CustoDia€/Dia </label>
                     </div>
-                    <div>Empresa: @veiculo.Empresa.Nome</div>
-                </div>
-                <div class="col-2">
                     <div>
                         <label>Preço Total: </label>
                         <label>@veiculo.Preco€</label>
                     </div>
+                    
                 </div>
                 <div class="col-2">
-                    <form asp-controller="Reservas" asp-action="NovaReserva" method="post">
-                        <input type="hidden" name="idVeiculo" value="@veiculo.Veiculo.Id" />
-                        <input type="hidden" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento" />
-                        <input type="hidden" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" />
-                        <button type="submit" class="btn btn-success">Reservar</button>
-                    </form>
+                    <div>Empresa: @veiculo.Empresa.Nome</div>
+                    @if(veiculo.Empresa != null && veiculo.Empresa.Avaliacoes != null ){
+                        <div>Avaliação: @veiculo.Empresa.MediaAvaliacao</div>
+                    }
                 </div>
+                @if(User.IsInRole("Cliente")){
+                <div class="col-2">
+                        <form asp-controller="Reservas" asp-action="NovaReserva" method="post">
+                            <input type="hidden" name="idVeiculo" value="@veiculo.Veiculo.Id" />
+                            <input type="hidden" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento" />
+                            <input type="hidden" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" />
+                            <button type="submit" class="btn btn-success">Reservar</button>
+                        </form>
+                </div>
+                }
             </div>
         </div>
     }
