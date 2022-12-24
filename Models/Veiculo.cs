@@ -15,11 +15,15 @@ namespace Rental4You.Models
 		[DisplayName("Descrição")]
 		public string Descricao { get; set; }
 
-		// public string Marca {get; set;}
+		public string Marca {get; set;}
 
-		// public string Modelo {get; set;}
+		public string Modelo {get; set;}
 
-		// public string Matricula {get; set;}
+        [DisplayName("Matrícula")]
+		[StringLength(6)]
+        [RegularExpression(@"[A-Z\d]{6}", ErrorMessage = "Matrícula inválida")]
+        [Required(ErrorMessage = "Necessita indicar a matrícula")]
+        public string Matricula {get; set;}
 
 		[DisplayName("Localização")]
 		public string Localizacao { get; set; }
