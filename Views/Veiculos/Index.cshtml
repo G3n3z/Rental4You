@@ -21,23 +21,25 @@ else
 <hr />
 <form asp-action="Index" method="get" class="container">
 	<div class="row">
-		<div class="col-3 mb-2">
+		<div class="col-1 form-group mb-2">
+			<label>Marca:</label>
+			<select name="Marca" asp-items=@ViewBag.Marcas class="custom-select mb-2"></select>
+		</div>
+		<div class="col-1 form-group mb-2">
 			<label>Categorias:</label>
 			<select name="Categoria" asp-items=@ViewBag.Categorias class="custom-select mb-2"></select>
 		</div>
-		<div class="col-3 form-group mb-2">
+		<div class="col-1 form-group mb-2">
 			<label>Estado:</label>
 			<select name="statusVeiculo" asp-items=@ViewBag.Estado class="form-group"></select>
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-3 form-group mb-2">
+		<div class="col-4 form-group mb-2">
 			<label>Ordenar por:</label>
 			<select name="order" asp-items=@ViewBag.Order class="form-group"></select>
-		</div>
-		<div class="col-3 form-group mb-2">
 			<button type="submit" class="btn btn-success btn-sm">Pesquisar</button>
-		</div>
+		</div>		
 	</div>
 </form>
 <table class="table">
@@ -47,7 +49,16 @@ else
 				@Html.DisplayNameFor(model => model.Nome)
 			</th>
 			<th>
+				@Html.DisplayNameFor(model => model.Marca)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Modelo)
+			</th>
+			<th>
 				@Html.DisplayNameFor(model => model.Descricao)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Matricula)
 			</th>
 			<th>
 				@Html.DisplayNameFor(model => model.Localizacao)
@@ -78,7 +89,16 @@ else
 					@Html.DisplayFor(modelItem => item.Nome)
 				</td>
 				<td>
+					@Html.DisplayFor(modelItem => item.Marca)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Modelo)
+				</td>
+				<td>
 					@Html.DisplayFor(modelItem => item.Descricao)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Matricula)
 				</td>
 				<td>
 					@Html.DisplayFor(modelItem => item.Localizacao)
