@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Escola_Segura.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -23,6 +25,7 @@ namespace Rental4You.Models
         }
 
         // GET: Registos
+        [Authorize(Roles = "Admin,Gestor,Funcionario,Cliente")]
         public async Task<IActionResult> Index(RegistoType? tipo)
         {
             ApplicationUser user = await _userManager.GetUserAsync(User);
@@ -48,6 +51,7 @@ namespace Rental4You.Models
         }
 
         // GET: Registos/Details/5
+        [Authorize(Roles = "Admin,Gestor,Funcionario,Cliente")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Registos == null)
@@ -78,6 +82,7 @@ namespace Rental4You.Models
         }
 
         // GET: Registos/Create
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> CreateAsync(RegistoType tipo, int idReserva)
         {
             var r = new Registo();
@@ -113,6 +118,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Create([Bind("Id,Data,Kms,Danos,Tipo,ReservaId,Observacoes")] Registo registo, [FromForm] List<IFormFile> ficheiros)
         {
 
@@ -190,6 +196,7 @@ namespace Rental4You.Models
         }
 
         // GET: Registos/Edit/5
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Registos == null)
@@ -210,6 +217,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Data,Kms,Danos,Observacoes")] Registo registo, [FromForm] List<IFormFile> ficheiros)
         {
             if (id != registo.Id)
@@ -241,6 +249,7 @@ namespace Rental4You.Models
         }
 
         // GET: Registos/Delete/5
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Registos == null)
@@ -261,6 +270,7 @@ namespace Rental4You.Models
         // POST: Registos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor,Funcionario")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Registos == null)

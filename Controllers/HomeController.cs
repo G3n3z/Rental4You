@@ -90,10 +90,11 @@ namespace Rental4You.Controllers
             {
                 return View("Search", pesquisa);
             }
-            var veiculos = _context.Veiculos.Include(v => v.Empresa).Include(v => v.Categoria).Where(veiculo => empresas.Contains(veiculo.EmpresaId));
-
+            var veiculos = _context.Veiculos.Include(v => v.Empresa).Include(v => v.Empresa.Avaliacoes)
+            .Include(v => v.Categoria).Where(veiculo => empresas.Contains(veiculo.EmpresaId));
+            veiculos = veiculos.Where(v => v.Empresa.Activo == true);
             veiculos = veiculos.Include(v => v.Reservas)
-                                        .Where(veiculo => veiculo.Reservas == null ||
+                                        .Where(veiculo => veiculo.Reservas == null || 
                                                   veiculo.Reservas.Count() == 0 ||
                                                   veiculo.Reservas.Where(reserva =>
                                                         //     13-12-2022 < 19-12-2022      &&   20-12-2022 < 24-12-2022  1-1

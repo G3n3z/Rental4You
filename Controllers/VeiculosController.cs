@@ -24,6 +24,7 @@ namespace Rental4You.Models
         }
 
         // GET: Veiculos
+        [Authorize(Roles = "Admin,Gestor, Funcionario")]
         public async Task<IActionResult> Index(string Categoria, StatusVeiculo? statusVeiculo, string order)
         {
             var filtrosCategorias = GetFilterCategorias(_context.Categorias.ToList());
@@ -72,7 +73,7 @@ namespace Rental4You.Models
 
 
 		// GET: Veiculos/Details/5
-		[Authorize(Roles = "Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Veiculos == null)
@@ -94,7 +95,7 @@ namespace Rental4You.Models
         }
 
 		// GET: Veiculos/Create
-		[Authorize(Roles = "Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public IActionResult Create()
         {
             ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
@@ -108,7 +109,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-		[Authorize(Roles = "Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo)
         {
             ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
@@ -144,7 +145,7 @@ namespace Rental4You.Models
         }
 
 		// GET: Veiculos/Edit/5
-		[Authorize(Roles = "Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Veiculos == null)
@@ -169,7 +170,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-		[Authorize(Roles = "Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo)
         {
             if (id != veiculo.Id)
@@ -210,7 +211,7 @@ namespace Rental4You.Models
         }
 
 		// GET: Veiculos/Delete/5
-		[Authorize(Roles = "Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Veiculos == null)
@@ -238,7 +239,7 @@ namespace Rental4You.Models
         // POST: Veiculos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-		[Authorize(Roles = "Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Veiculos == null)

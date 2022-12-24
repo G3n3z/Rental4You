@@ -12,10 +12,10 @@ else
 {
 	<h1>Frota</h1>
 }
-@if (User.IsInRole("Gestor") || User.IsInRole("Funcionario"))
+@if (User.IsInRole("Gestor") || User.IsInRole("Funcionario") || User.IsInRole("Admin"))
 {
 	<p>
-		<a asp-action="Create" class="btn btn-primary">Adicionar Veículo</a>
+		<a asp-action="Create" class="btn btn-primary">Adicionar Veï¿½culo</a>
 	</p>
 }
 <hr />
