@@ -129,7 +129,7 @@ namespace Rental4You.Controllers
                     veiculos = veiculos.OrderByDescending(v => v.Empresa.MediaAvaliacao);
                 }
             }
-            veiculos = veiculos.GroupBy((veiculo) => new { veiculo.Marca, veiculo.Modelo, veiculo.EmpresaId }).Select(x => x.First());
+            //veiculos = veiculos.GroupBy((veiculo) => new { veiculo.Marca, veiculo.Modelo, veiculo.EmpresaId }).Select(x => x.First());
             List<Veiculo> model = veiculos.ToList();
             double dias = (pesquisa.DataEntrega - pesquisa.DataLevantamento).TotalHours / 24;
             SearchViewModel viewModels = new SearchViewModel();

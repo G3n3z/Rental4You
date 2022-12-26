@@ -108,6 +108,7 @@ namespace Rental4You.Models
             {
                 return NotFound();
             }
+            
             r.Data = DateTime.Now;
             r.ReservaId = idReserva;
             return View(r);
@@ -130,7 +131,7 @@ namespace Rental4You.Models
                 return Unauthorized();
             }
 
-            Reserva? reserva = await _context.Reservas.FindAsync(registo.ReservaId);
+            Reserva? reserva = _context.Reservas.Include(r => r.Veiculo).FirstOrDefault(r => r.ReservaId == registo.ReservaId);
             if(reserva == null)
             {
                 return View(registo);
@@ -140,11 +141,13 @@ namespace Rental4You.Models
             {
                 reserva.Estado = StatusReserva.provided;
                 reserva.Levantamento = registo;
+                reserva.Veiculo.Disponivel = false;
             }else if (registo.Tipo == RegistoType.ENTREGA && reserva.Estado == StatusReserva.provided)
             {
                 reserva.Estado = StatusReserva.delivered;
                 reserva.Entrega = registo;
                 reserva.Concluido = true;
+                reserva.Veiculo.Disponivel = true;
             }
             else
             {
@@ -160,6 +163,7 @@ namespace Rental4You.Models
                 try { 
                     _context.Add(registo);
                     _context.Update(reserva);
+                    _context.Update(reserva.Veiculo);
                     await _context.SaveChangesAsync();
 
                     string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/" + registo.Id.ToString());
