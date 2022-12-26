@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Rental4You.Models
 {
@@ -43,5 +44,7 @@ namespace Rental4You.Models
                     return "";  
             }
         }
-    }
+        [DataType(DataType.Date)]
+		public DateTime DataReserva { get; set; }
+	}
 }

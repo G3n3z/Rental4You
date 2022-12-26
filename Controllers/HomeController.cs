@@ -202,7 +202,7 @@ namespace Rental4You.Controllers
         {
             var filter = categorias.Select(categoria => categoria.Nome).Distinct().ToArray();
             var items = new SelectListItem[filter.Count() + 1];
-            items[0] = new SelectListItem() { Text = " ", Value = string.Empty };
+            items[0] = new SelectListItem() { Text = "Escolha a Categoria...", Value = string.Empty };
             for (int i = 1; i < filter.Count()+1; i++)
             {
                 items[i] = new SelectListItem() { Text = filter[i-1], Value = filter[i-1] };

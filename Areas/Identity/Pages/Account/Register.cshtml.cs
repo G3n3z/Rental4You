@@ -119,7 +119,7 @@ namespace Rental4You.Areas.Identity.Pages.Account
             [Display(Name = "Contacto")]
             public string PhoneNumber { get; set; }
 
-        }
+		}
 
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -144,6 +144,7 @@ namespace Rental4You.Areas.Identity.Pages.Account
                 user.UltimoNome = Input.UltimoNome;
                 user.DataNascimento= Input.DataNascimento;
                 user.NIF = Input.NIF;
+                user.DataRegisto = DateTime.Today;
 
                 await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 var result = await _userManager.CreateAsync(user, Input.Password);

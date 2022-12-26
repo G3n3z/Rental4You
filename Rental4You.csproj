@@ -28,7 +28,6 @@
     <None Remove="ViewModel\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\Users\" />
     <Folder Include="ViewModel\" />
   </ItemGroup>
 </Project>

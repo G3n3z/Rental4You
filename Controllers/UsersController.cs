@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -267,6 +268,46 @@ namespace Rental4You.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-    }
+		public async Task<IActionResult> GraficoNovosUtilizadoresMensais()
+		{
+			return View();
+		}
+
+		public async Task<IActionResult> GetDadosNovosUtilizadoresMensais()
+		{
+			//dados de exemplo
+			List<object> dados = new List<object>();
+			DataTable dt = new DataTable();
+			dt.Columns.Add("Utilizadores", Type.GetType("System.String"));
+			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
+
+			var dadosUsers = await _context.Users
+				.Where(r => r.DataRegisto >= DateTime.Now.AddMonths(-12) && r.EmpresaId == null)
+				.GroupBy(r => new { date = new DateTime(r.DataRegisto.Year, r.DataRegisto.Month, 1) })
+				.Select(r => new
+				{
+					Mes = r.Key.date.ToString("MMM/yyyy"),
+					Qtd = r.Count()
+				})
+				.ToListAsync();
+			DataRow dr;
+			foreach (var user in dadosUsers)
+			{
+				dr = dt.NewRow();
+				dr["Utilizadores"] = user.Mes;
+				dr["Quantidade"] = user.Qtd;
+				dt.Rows.Add(dr);
+			}
+
+			foreach (DataColumn dc in dt.Columns)
+			{
+				List<object> x = new List<object>();
+				x = (from DataRow drr in dt.Rows select drr[dc.ColumnName]).ToList();
+				dados.Add(x);
+			}
+			return Json(dados);
+		}
+
+	}
 }
 

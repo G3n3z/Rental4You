@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +27,6 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas
-        [Authorize(Roles = "Admin,Gestor,Funcionario")]
         public async Task<IActionResult> Index([Bind("DataLevantamento,DataEntrega,NomeCliente,Veiculo,Estado, Categoria, order")]ReservasSearchViewModel viewModel )
         {
             var EstadoList = GetEstado();
@@ -105,7 +106,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas/Details/5
-        [Authorize(Roles = "Admin,Gestor,Funcionario")]
+        [Authorize(Roles = "Gestor,Funcionario,Cliente")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Reservas == null)
@@ -127,7 +128,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas/Create
-        [Authorize(Roles = "Gestor,Funcionario")]
+        [Authorize(Roles = "Gestor,Funcionario,Cliente")]
         public async Task<IActionResult> Create(int? idVeiculo, DateTime datalevantamento, DateTime dataentrega)
         {
             if (idVeiculo == null)
@@ -155,6 +156,7 @@ namespace Rental4You.Models
             reserva.CustoTotal = ((int)Math.Ceiling(dias)) * veiculo.CustoDia;
             reserva.DataLevantamento = datalevantamento;
             reserva.DataEntrega = dataentrega;
+            reserva.DataReserva = DateTime.Now;
             return View();
         }
 
@@ -163,7 +165,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Gestor,Funcionario")]
+        [Authorize(Roles = "Gestor,Funcionario,Cliente")]
         public async Task<IActionResult> Create([Bind("DataLevantamento,DataEntrega,CustoTotal,VeiculoId")] Reserva reserva)
         {
 
@@ -300,7 +302,7 @@ namespace Rental4You.Models
         }
 
         [HttpPost]
-        [Authorize(Roles = "Gestor,Funcionario")]
+        [Authorize(Roles = "Gestor,Funcionario,Cliente")]
         public async Task<IActionResult> NovaReserva(int? idVeiculo, DateTime DataLevantamento, DateTime DataEntrega)
         {
             if (idVeiculo == null)
@@ -359,7 +361,87 @@ namespace Rental4You.Models
 
         }
 
-        private IEnumerable<SelectListItem> GetCategoria(List<Categoria> categorias)
+		public async Task<IActionResult> GraficoReservasDiarias()
+		{
+			return View();
+		}
+
+        [HttpPost]
+        public async Task<IActionResult> GetDadosReservasDiarias()
+        {
+			List<object> dados = new List<object>();
+			DataTable dt = new DataTable();
+			dt.Columns.Add("Reservas", Type.GetType("System.String"));
+			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
+
+            var dadosReservas = await _context.Reservas
+                .Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+                .GroupBy(r => r.DataReserva)
+                .Select(r => new
+                {
+                    Data = new DateOnly(r.Key.Year,r.Key.Month, r.Key.Day),
+                    Qtd = r.Count()
+                })
+                .ToListAsync();
+            DataRow dr;
+			foreach(var reserva in dadosReservas)
+            {
+				dr = dt.NewRow();
+				dr["Reservas"] = reserva.Data;
+                dr["Quantidade"] = reserva.Qtd;
+                dt.Rows.Add(dr);
+            }
+
+			foreach (DataColumn dc in dt.Columns)
+			{
+				List<object> x = new List<object>();
+				x = (from DataRow drr in dt.Rows select drr[dc.ColumnName]).ToList();
+				dados.Add(x);
+			}
+			return Json(dados);
+		}
+
+		public async Task<IActionResult> GraficoReservasMensais()
+		{
+			return View();
+		}
+
+		public async Task<IActionResult> GetDadosReservasMensais()
+		{
+			//dados de exemplo
+			List<object> dados = new List<object>();
+			DataTable dt = new DataTable();
+			dt.Columns.Add("Reservas", Type.GetType("System.String"));
+			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
+
+			var dadosReservas = await _context.Reservas
+				.Where(r => r.DataReserva >= DateTime.Now.AddMonths(-12))
+				.GroupBy(r => new {date = new DateOnly(r.DataReserva.Year, r.DataReserva.Month, 1)})
+				.Select(r => new
+				{
+					Mes = r.Key.date.ToString("MMM/yyyy"),
+					Qtd = r.Count()
+				})
+				.ToListAsync();
+			DataRow dr;
+			foreach (var reserva in dadosReservas)
+			{
+				dr = dt.NewRow();
+				dr["Reservas"] = reserva.Mes;
+				dr["Quantidade"] = reserva.Qtd;
+				dt.Rows.Add(dr);
+			}
+
+			foreach (DataColumn dc in dt.Columns)
+			{
+				List<object> x = new List<object>();
+				x = (from DataRow drr in dt.Rows select drr[dc.ColumnName]).ToList();
+				dados.Add(x);
+			}
+			return Json(dados);
+		}
+
+		private IEnumerable<SelectListItem> GetCategoria(List<Categoria> categorias)
         {
             var filter = categorias.Select(categoria => categoria.Nome).Distinct().ToArray();
             var items = new SelectListItem[filter.Count() + 1];

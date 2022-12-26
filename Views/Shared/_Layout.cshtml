@@ -43,6 +43,16 @@
                                     Utilizadores
                                 </a>
                             </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Dashboard
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-action="GraficoReservasDiarias" asp-controller="Reservas">Reservas diárias</a></li>
+                                    <li><a class="dropdown-item" asp-action="GraficoReservasMensais" asp-controller="Reservas">Reservas mensais</a></li>
+                                    <li><a class="dropdown-item" asp-action="GraficoNovosUtilizadoresMensais" asp-controller="Users">Novos clientes</a></li>
+                                </ul>
+                            </li>
                         }
                         else if (User.IsInRole("Gestor"))
                         {
