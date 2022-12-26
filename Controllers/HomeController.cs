@@ -98,16 +98,18 @@ namespace Rental4You.Controllers
                                                   veiculo.Reservas.Count() == 0 ||
                                                   veiculo.Reservas.Where(reserva =>
                                                         //     13-12-2022 < 19-12-2022      &&   20-12-2022 < 24-12-2022  1-1
-                                                        (pesquisa.DataLevantamento <= reserva.DataLevantamento && reserva.DataEntrega <= pesquisa.DataEntrega) ||
+                                                        ((pesquisa.DataLevantamento <= reserva.DataLevantamento && reserva.DataEntrega <= pesquisa.DataEntrega) ||
                                                         //     18-12-2022 < 19-12-2022      &&   18-12-2022 < 19-12-2022 1-1
                                                         (pesquisa.DataLevantamento <= reserva.DataLevantamento && reserva.DataLevantamento <= pesquisa.DataEntrega) ||
                                                        //     19-12-2022 < 20-12-2022      &&   20-12-2022 < 24-12-2022 1-1
                                                        (pesquisa.DataLevantamento <= reserva.DataEntrega && reserva.DataEntrega <= pesquisa.DataEntrega) ||
                                                        //     19-12-2022 11:00 > 19-12-2022 10:00     &&   20-12-2022 11:00 > 20-12-2022 10:00 1-1
-                                                       (pesquisa.DataLevantamento >= reserva.DataLevantamento && reserva.DataEntrega >= pesquisa.DataEntrega)
+                                                       (pesquisa.DataLevantamento >= reserva.DataLevantamento && reserva.DataEntrega >= pesquisa.DataEntrega))
+
+                                                       && reserva.Estado != StatusReserva.rejected
                                                     ).Count() == 0);
-            var aux = veiculos.ToList();
-            if(pesquisa.FiltroCategoria != null)
+            
+            if (pesquisa.FiltroCategoria != null)
             {
                 veiculos = veiculos.Where(v => v.Categoria.Nome == pesquisa.FiltroCategoria);       
             }
@@ -127,6 +129,7 @@ namespace Rental4You.Controllers
                     veiculos = veiculos.OrderByDescending(v => v.Empresa.MediaAvaliacao);
                 }
             }
+            veiculos = veiculos.GroupBy((veiculo) => new { veiculo.Marca, veiculo.Modelo, veiculo.EmpresaId }).Select(x => x.First());
             List<Veiculo> model = veiculos.ToList();
             double dias = (pesquisa.DataEntrega - pesquisa.DataLevantamento).TotalHours / 24;
             SearchViewModel viewModels = new SearchViewModel();

@@ -208,7 +208,7 @@ namespace Rental4You.Models
                 gestor.PhoneNumber = null;
                 gestor.NIF = "0000000";
                 gestor.UserName = gestor.Email;
-                
+                empresa.MediaAvaliacao = -1;
                 _context.Add(empresa);  
                 await _context.SaveChangesAsync();
                 gestor.EmpresaId = empresa.Id;

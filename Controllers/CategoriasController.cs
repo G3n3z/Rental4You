@@ -159,12 +159,21 @@ namespace Rental4You.Models
 				return Problem("Entity set 'ApplicationDbContext.Categorias'  is null.");
 			}
 			var categoria = await _context.Categorias.FindAsync(id);
-			if (categoria != null)
-			{
-				_context.Categorias.Remove(categoria);
-			}
+			if(categoria == null)
+            {
+				return NotFound();
+            }
 
-			await _context.SaveChangesAsync();
+            if (categoria.Veiculos != null && categoria.Veiculos.Count() != 0)
+            {
+                return BadRequest();
+            }
+            if (categoria != null)
+            {
+                _context.Categorias.Remove(categoria);
+            }
+
+            await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
 

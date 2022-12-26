@@ -15,9 +15,11 @@ namespace Rental4You.Models
 		[DisplayName("Descrição")]
 		public string Descricao { get; set; }
 
-		public string Marca {get; set;}
+        [Required(ErrorMessage = "Necessita indicar a marca")]
+        public string Marca {get; set;}
 
-		public string Modelo {get; set;}
+        [Required(ErrorMessage = "Necessita indicar o modelo")]
+        public string Modelo {get; set;}
 
         [DisplayName("Matrícula")]
 		[StringLength(6)]

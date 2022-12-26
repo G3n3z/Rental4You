@@ -27,6 +27,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas
+        [Authorize]
         public async Task<IActionResult> Index([Bind("DataLevantamento,DataEntrega,NomeCliente,Veiculo,Estado, Categoria, order")]ReservasSearchViewModel viewModel )
         {
             var EstadoList = GetEstado();
@@ -128,7 +129,7 @@ namespace Rental4You.Models
         }
 
         // GET: Reservas/Create
-        [Authorize(Roles = "Gestor,Funcionario,Cliente")]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> Create(int? idVeiculo, DateTime datalevantamento, DateTime dataentrega)
         {
             if (idVeiculo == null)
@@ -140,14 +141,31 @@ namespace Rental4You.Models
             {
                 return RedirectToAction(nameof(Index));
             }
-            
+
             ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["VeiculoId"] = new SelectList(_context.Veiculos, "Id", "Id");
-            var veiculo = await _context.Veiculos.FirstOrDefaultAsync(v => v.Id == idVeiculo);
-            if (veiculo == null)
+            var veiculos =  _context.Veiculos.Where(v => v.Id == idVeiculo);
+            
+
+
+            veiculos.Where(veiculo => veiculo.Reservas == null ||
+                                                  veiculo.Reservas.Count() == 0 ||
+                                                  veiculo.Reservas.Where(reserva =>
+                                                        //     13-12-2022 < 19-12-2022      &&   20-12-2022 < 24-12-2022  1-1
+                                                        (datalevantamento <= reserva.DataLevantamento && reserva.DataEntrega <= dataentrega) ||
+                                                        //     18-12-2022 < 19-12-2022      &&   18-12-2022 < 19-12-2022 1-1
+                                                        (datalevantamento <= reserva.DataLevantamento && reserva.DataLevantamento <= dataentrega) ||
+                                                       //     19-12-2022 < 20-12-2022      &&   20-12-2022 < 24-12-2022 1-1
+                                                       (datalevantamento <= reserva.DataEntrega && reserva.DataEntrega <= dataentrega) ||
+                                                       //     19-12-2022 11:00 > 19-12-2022 10:00     &&   20-12-2022 11:00 > 20-12-2022 10:00 1-1
+                                                       (datalevantamento >= reserva.DataLevantamento && reserva.DataEntrega >= dataentrega)
+                                                    ).Count() == 0);
+            if (veiculos.Count() == 0)
             {
                 return NotFound();
             }
+
+            var veiculo = veiculos.First();
 
             decimal dias = (dataentrega.Hour - datalevantamento.Hour) / 24;
             ViewData["Valor"] = ((int)Math.Ceiling(dias)) * veiculo.CustoDia;
@@ -165,7 +183,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Gestor,Funcionario,Cliente")]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> Create([Bind("DataLevantamento,DataEntrega,CustoTotal,VeiculoId")] Reserva reserva)
         {
 
@@ -173,6 +191,10 @@ namespace Rental4You.Models
             if (veiculo == null)
             {
                 return NotFound();
+            }
+            if(reserva.DataEntrega < reserva.DataLevantamento)
+            {
+                return BadRequest();
             }
             ModelState.Remove(nameof(reserva.Veiculo));
             ModelState.Remove(nameof(reserva.Avaliacao));
@@ -302,7 +324,7 @@ namespace Rental4You.Models
         }
 
         [HttpPost]
-        [Authorize(Roles = "Gestor,Funcionario,Cliente")]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> NovaReserva(int? idVeiculo, DateTime DataLevantamento, DateTime DataEntrega)
         {
             if (idVeiculo == null)
@@ -320,6 +342,8 @@ namespace Rental4You.Models
             {
                 return NotFound();
             }
+
+
             
             double dias = ((DataEntrega - DataLevantamento).TotalHours/24);
             
@@ -348,7 +372,7 @@ namespace Rental4You.Models
             if(reserva.Estado != StatusReserva.pending){
                 return RedirectToAction(nameof(Index));
             }
-            if (newStatus != StatusReserva.approved || newStatus != StatusReserva.rejected)
+            if (newStatus != StatusReserva.approved && newStatus != StatusReserva.rejected)
             {
                 return RedirectToAction(nameof(Index));
             }

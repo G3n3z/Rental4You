@@ -202,6 +202,7 @@ namespace Rental4You.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles= "Admin")]
         public async Task<IActionResult> ChangeStatus(string userId, [Bind("Active")] Boolean Active)
         {
             if(userId == null)
