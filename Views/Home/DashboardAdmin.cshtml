@@ -1,0 +1,138 @@
+﻿@{
+	ViewBag.Title = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Dashboard</h1>
+<hr />
+<div>
+	<br />
+	<h2>Reservas nos últimos 30 dias</h2>
+	<br />
+	<canvas id="chartGraficoReservasDiarias"></canvas>
+	<br />
+	<hr />
+	<br />
+	<h2>Reservas mensais nos últimos 12 meses</h2>
+	<br />
+	<canvas id="chartGraficoReservasMensais"></canvas>
+	<br />
+	<hr />
+	<br />
+	<h2>Novos clientes nos últimos 12 meses</h2>
+	<br />
+	<canvas id="chartGraficoNovosUtilizadoresMensais"></canvas>
+</div>
+@section Scripts {
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		$.ajax({
+			type: "POST",
+			url: "/Reservas/GetDadosReservasDiarias",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function (data) {
+				let Labels = data[0];
+				let Datasets1 = data[1];
+				let dataT = {
+					labels: Labels,
+					datasets: [{
+						label: "Datas",
+						data: Datasets1,
+						fill: false,
+						borderWidth: 1,
+						backgroundColor: getRandomColor()
+					}]
+				};
+				let ctx = $("#chartGraficoReservasDiarias").get(0).getContext("2d");
+				let myNewChart = new Chart(ctx, {
+					type: 'bar',
+					data: dataT,
+					options: {
+						responsive: true,
+						title: { display: true, text: 'Reservas Diarias' },
+						legend: { position: 'bottom' },
+					}
+				});
+			}
+		});
+	</script>
+	<script>
+		$.ajax({
+			type: "POST",
+			url: "/Reservas/GetDadosReservasMensais",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function (data) {
+				let Labels = data[0];
+				let Datasets1 = data[1];
+				let dataT = {
+					labels: Labels,
+					datasets: [{
+						label: "Meses",
+						data: Datasets1,
+						fill: false,
+						borderWidth: 1,
+						backgroundColor: getRandomColor()
+					}]
+				};
+				let ctx = $("#chartGraficoReservasMensais").get(0).getContext("2d");
+				let myNewChart = new Chart(ctx, {
+					type: 'bar',
+					data: dataT,
+					options: {
+						responsive: true,
+						title: { display: true, text: 'Reservas Mensais' },
+						legend: { position: 'bottom' },
+					}
+				});
+			}
+		});
+	</script>
+	<script>
+		$.ajax({
+			type: "POST",
+			url: "/Users/GetDadosNovosUtilizadoresMensais",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function (data) {
+				let Labels = data[0];
+				let Datasets1 = data[1];
+				let dataT = {
+					labels: Labels,
+					datasets: [{
+						label: "Utilizadores",
+						data: Datasets1,
+						fill: false,
+						borderWidth: 1,
+						backgroundColor: getRandomColor()
+					}]
+				};
+				let ctx = $("#chartGraficoNovosUtilizadoresMensais").get(0).getContext("2d");
+				let myNewChart = new Chart(ctx, {
+					type: 'bar',
+					data: dataT,
+					options: {
+						responsive: true,
+						title: { display: true, text: 'Novos Utilizadores Mensais' },
+						legend: { position: 'bottom' },
+					}
+				});
+			}
+		});
+	</script>
+	<script>
+		function getRandomColor() {
+			let characters = '0123456789ABCDEF'.split('');
+			let colors = [];
+			for (let k = 0; k < 12; k++) {
+				let color = '#';
+				for (let i = 0; i < 6; i++) {
+					color += characters[Math.floor(Math.random() * 16)];
+				}
+				color += '66';
+				colors.push(color);
+			}
+			return colors;
+		}
+	</script>
+ }

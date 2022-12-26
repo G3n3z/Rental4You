@@ -268,11 +268,9 @@ namespace Rental4You.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-		public async Task<IActionResult> GraficoNovosUtilizadoresMensais()
-		{
-			return View();
-		}
 
+		[HttpPost]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetDadosNovosUtilizadoresMensais()
 		{
 			//dados de exemplo

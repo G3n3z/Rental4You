@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Rental4You.Data;
@@ -21,7 +22,16 @@ namespace Rental4You.Controllers
 
         public IActionResult Index()
         {
-            SearchViewModel vm = new SearchViewModel();
+            if (User.IsInRole("Admin")) 
+            { 
+                return RedirectToAction("DashboardAdmin");
+            }
+			if (User.IsInRole("Gestor"))
+			{
+				return RedirectToAction("DashboardGestor");
+			}
+
+			SearchViewModel vm = new SearchViewModel();
             DateTime now = DateTime.Now;
             now = now.AddMinutes(-now.Minute); // para colocar os minutos a 00 na view
             if(now.Hour < 8)
@@ -43,10 +53,21 @@ namespace Rental4You.Controllers
             ViewData["Categorias"]= GetFilterCategorias(_context.Categorias.ToList());
 
             return View(vm);
+		}
+
+        [Authorize(Roles = "Admin")]
+		public async Task<IActionResult> DashboardAdmin()
+        {
+            return View();
         }
 
+		[Authorize(Roles = "Gestor")]
+		public async Task<IActionResult> DashboardGestor()
+		{
+			return View();
+		}
 
-        public IActionResult Search([Bind("Localizacao, DataLevantamento, DataEntrega, Categoria, FiltroEmpresa, FiltroCategoria, Order")] SearchViewModel pesquisa)
+		public IActionResult Search([Bind("Localizacao, DataLevantamento, DataEntrega, Categoria, FiltroEmpresa, FiltroCategoria, Order")] SearchViewModel pesquisa)
         {
             ViewData["pesquisa"] = pesquisa;
             
