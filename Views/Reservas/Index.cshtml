@@ -77,6 +77,9 @@
                 Data de Entrega
             </th>
             <th>
+                Estado
+            </th>
+            <th>
                 Concluido
             </th>
             <th>Acções</th>
@@ -109,6 +112,9 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.DataEntrega)
+                </td>
+                <td>
+                    @Reserva.translate(item.Estado)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Concluido)
@@ -150,8 +156,8 @@
                                 <div class="col-3" style="margin-left: 15px;">
                                     @if (item.Entrega == null)
                                     {
-                                    <a asp-action="Create" asp-controller="Registos" asp-route-idReserva="@item.ReservaId"
-                                       asp-route-tipo="@RegistoType.ENTREGA" class="btn btn-warning ml-2">Entrega</a>
+                                        <a asp-action="Create" asp-controller="Registos" asp-route-idReserva="@item.ReservaId"
+                                           asp-route-tipo="@RegistoType.ENTREGA" class="btn btn-warning ml-2">Entrega</a>
                                     }
                                 </div>
                             }

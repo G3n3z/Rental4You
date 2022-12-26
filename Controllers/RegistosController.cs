@@ -108,6 +108,7 @@ namespace Rental4You.Models
             {
                 return NotFound();
             }
+            
             r.Data = DateTime.Now;
             r.ReservaId = idReserva;
             return View(r);
@@ -130,7 +131,7 @@ namespace Rental4You.Models
                 return Unauthorized();
             }
 
-            Reserva? reserva = await _context.Reservas.FindAsync(registo.ReservaId);
+            Reserva? reserva = _context.Reservas.Include(r => r.Veiculo).FirstOrDefault(r => r.ReservaId == registo.ReservaId);
             if(reserva == null)
             {
                 return View(registo);
@@ -140,10 +141,13 @@ namespace Rental4You.Models
             {
                 reserva.Estado = StatusReserva.provided;
                 reserva.Levantamento = registo;
+                reserva.Veiculo.Disponivel = false;
             }else if (registo.Tipo == RegistoType.ENTREGA && reserva.Estado == StatusReserva.provided)
             {
                 reserva.Estado = StatusReserva.delivered;
                 reserva.Entrega = registo;
+                reserva.Concluido = true;
+                reserva.Veiculo.Disponivel = true;
             }
             else
             {
@@ -159,6 +163,7 @@ namespace Rental4You.Models
                 try { 
                     _context.Add(registo);
                     _context.Update(reserva);
+                    _context.Update(reserva.Veiculo);
                     await _context.SaveChangesAsync();
 
                     string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/" + registo.Id.ToString());
@@ -246,45 +251,6 @@ namespace Rental4You.Models
                 return RedirectToAction(nameof(Index));
             }
             return View(registo);
-        }
-
-        // GET: Registos/Delete/5
-        [Authorize(Roles = "Gestor,Funcionario")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Registos == null)
-            {
-                return NotFound();
-            }
-
-            var registo = await _context.Registos
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (registo == null)
-            {
-                return NotFound();
-            }
-
-            return View(registo);
-        }
-
-        // POST: Registos/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Gestor,Funcionario")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Registos == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Registos'  is null.");
-            }
-            var registo = await _context.Registos.FindAsync(id);
-            if (registo != null)
-            {
-                _context.Registos.Remove(registo);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool RegistoExists(int id)

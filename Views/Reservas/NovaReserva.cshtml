@@ -4,34 +4,42 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>Confirmação de Reserva</h1>
 
-<h4>Reserva</h4>
+
 <hr />
 
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" method="post">
             <input type="hidden" asp-for="VeiculoId"/>
+            <div class="form-group mb-3">
+                <label class="control-label">Marca do Veiculo</label>
+                <input type="text" value = "@ViewBag.Veiculo.Marca" readonly="readonly" placeholder="Marca" class="form-control"/>
+            </div>
+            <div class="form-group mb-3">
+                <label class="control-label">Modelo do Veiculo</label>
+                <input type="text" value = "@ViewBag.Veiculo.Modelo" readonly="readonly" placeholder="Modelo" class="form-control"/>
+            </div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="DataLevantamento" class="control-label"></label>
                 <input type="text" asp-for="DataLevantamento" readonly="readonly" placeholder="Localização" class="form-control"/>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3 ">
                 <label asp-for="DataEntrega" class="control-label"></label>
                 <input type="text" asp-for="DataEntrega"readonly="readonly" class="form-control" />
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Veiculo.CustoDia" class="control-label"></label>
                 <input asp-for="Veiculo.CustoDia" readonly="readonly" class="form-control" />
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="CustoTotal" class="control-label"></label>
                 <input asp-for="CustoTotal" readonly="readonly" class="form-control" />
             </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Continuar Reserva</button>
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-success">Continuar Reserva</button>
             </div>
 
         </form>
@@ -39,7 +47,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" class="btn btn-primary">Back to List</a>
 </div>
 
 @section Scripts {

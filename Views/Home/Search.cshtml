@@ -75,7 +75,12 @@
                 <div class="col-2">
                     <div>Empresa: @veiculo.Empresa.Nome</div>
                     @if(veiculo.Empresa != null && veiculo.Empresa.Avaliacoes != null ){
-                        <div>Avaliação: @veiculo.Empresa.MediaAvaliacao</div>
+                        @if (veiculo.Empresa.MediaAvaliacao == -1)
+                        {
+                            <div>Avaliação: -/-</div>
+                        }else{
+                            <div>Avaliação: @veiculo.Empresa.MediaAvaliacao.ToString() / 10</div>
+                        }
                     }
                 </div>
                 @if(User.IsInRole("Cliente")){
