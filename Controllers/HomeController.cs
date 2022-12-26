@@ -98,13 +98,13 @@ namespace Rental4You.Controllers
                                                   veiculo.Reservas.Count() == 0 ||
                                                   veiculo.Reservas.Where(reserva =>
                                                         //     13-12-2022 < 19-12-2022      &&   20-12-2022 < 24-12-2022  1-1
-                                                        (pesquisa.DataLevantamento < reserva.DataLevantamento && reserva.DataEntrega < pesquisa.DataEntrega) ||
+                                                        (pesquisa.DataLevantamento <= reserva.DataLevantamento && reserva.DataEntrega <= pesquisa.DataEntrega) ||
                                                         //     18-12-2022 < 19-12-2022      &&   18-12-2022 < 19-12-2022 1-1
-                                                        (pesquisa.DataLevantamento < reserva.DataLevantamento && reserva.DataLevantamento < pesquisa.DataEntrega) ||
+                                                        (pesquisa.DataLevantamento <= reserva.DataLevantamento && reserva.DataLevantamento <= pesquisa.DataEntrega) ||
                                                        //     19-12-2022 < 20-12-2022      &&   20-12-2022 < 24-12-2022 1-1
-                                                       (pesquisa.DataLevantamento < reserva.DataEntrega && reserva.DataEntrega < pesquisa.DataEntrega) ||
+                                                       (pesquisa.DataLevantamento <= reserva.DataEntrega && reserva.DataEntrega <= pesquisa.DataEntrega) ||
                                                        //     19-12-2022 11:00 > 19-12-2022 10:00     &&   20-12-2022 11:00 > 20-12-2022 10:00 1-1
-                                                       (pesquisa.DataLevantamento > reserva.DataLevantamento && reserva.DataEntrega > pesquisa.DataEntrega)
+                                                       (pesquisa.DataLevantamento >= reserva.DataLevantamento && reserva.DataEntrega >= pesquisa.DataEntrega)
                                                     ).Count() == 0);
             var aux = veiculos.ToList();
             if(pesquisa.FiltroCategoria != null)
