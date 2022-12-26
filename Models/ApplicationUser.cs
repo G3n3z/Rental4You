@@ -35,6 +35,8 @@ namespace Rental4You.Models
         public ICollection<Reserva> Reservas { get; set; }
 
         public ICollection<Registo> Registos { get; set; }
-        
-    }
+
+		[DataType(DataType.Date)]
+		public DateTime DataRegisto { get; set; }
+	}
 }
