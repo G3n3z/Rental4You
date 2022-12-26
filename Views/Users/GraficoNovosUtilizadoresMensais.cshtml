@@ -2,16 +2,16 @@
 	ViewBag.Title = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h1>Reservas nos últimos 30 dias</h1>
+<h1>Novos clientes nos últimos 12 meses</h1>
 <div>
-	<canvas id="chartGraficoReservasDiarias"></canvas>
+	<canvas id="chartGraficoNovosUtilizadoresMensais"></canvas>
 </div>
 @section Scripts {
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
 		$.ajax({
 			type: "POST",
-			url: "/Reservas/GetDadosReservasDiarias",
+			url: "/Users/GetDadosNovosUtilizadoresMensais",
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function (data) {
@@ -20,20 +20,20 @@
 				let dataT = {
 					labels: Labels,
 					datasets: [{
-						label: "Datas",
+						label: "Utilizadores",
 						data: Datasets1,
 						fill: false,
 						borderWidth: 1,
 						backgroundColor: ["red", "green", "blue", "cyan", "yellow"]
 					}]
 				};
-				let ctx = $("#chartGraficoReservasDiarias").get(0).getContext("2d");
+				let ctx = $("#chartGraficoNovosUtilizadoresMensais").get(0).getContext("2d");
 				let myNewChart = new Chart(ctx, {
 					type: 'bar',
 					data: dataT,
 					options: {
 						responsive: true,
-						title: { display: true, text: 'Reservas Diarias' },
+						title: { display: true, text: 'Novos Utilizadores Mensais' },
 						legend: { position: 'bottom' },
 					}
 				});
