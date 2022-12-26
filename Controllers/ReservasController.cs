@@ -402,7 +402,6 @@ namespace Rental4You.Models
 		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetDadosReservasMensais()
 		{
-			//dados de exemplo
 			List<object> dados = new List<object>();
 			DataTable dt = new DataTable();
 			dt.Columns.Add("Reservas", Type.GetType("System.String"));
@@ -440,7 +439,6 @@ namespace Rental4You.Models
 		[Authorize(Roles = "Gestor")]
 		public async Task<IActionResult> GetDadosFaturacaoSemanal()
 		{
-			//dados de exemplo
 			List<object> dados = new List<object>();
 			DataTable dt = new DataTable();
 			dt.Columns.Add("Faturacao", Type.GetType("System.String"));
@@ -478,7 +476,6 @@ namespace Rental4You.Models
 		[Authorize(Roles = "Gestor")]
 		public async Task<IActionResult> GetDadosFaturacaoMensal()
 		{
-			//dados de exemplo
 			List<object> dados = new List<object>();
 			DataTable dt = new DataTable();
 			dt.Columns.Add("Faturacao", Type.GetType("System.String"));
@@ -516,7 +513,6 @@ namespace Rental4You.Models
 		[Authorize(Roles = "Gestor")]
 		public async Task<IActionResult> GetDadosMediaReservasDiariasMensal()
 		{
-			//dados de exemplo
 			List<object> dados = new List<object>();
 			DataTable dt = new DataTable();
 			dt.Columns.Add("Faturacao", Type.GetType("System.String"));
