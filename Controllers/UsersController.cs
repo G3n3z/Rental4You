@@ -30,8 +30,9 @@ namespace Rental4You.Controllers
             _context = context;
         }
 
-        // GET: /<controller>/
-        public async Task<IActionResult> Index()
+		// GET: /<controller>/
+		[Authorize(Roles = "Admin, Gestor")]
+		public async Task<IActionResult> Index()
         {
             List<UserRolesViewModel> viewModel = new List<UserRolesViewModel>();
             List<ApplicationUser> users = null;

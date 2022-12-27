@@ -141,13 +141,11 @@ namespace Rental4You.Models
             {
                 reserva.Estado = StatusReserva.provided;
                 reserva.Levantamento = registo;
-                reserva.Veiculo.Disponivel = false;
             }else if (registo.Tipo == RegistoType.ENTREGA && reserva.Estado == StatusReserva.provided)
             {
                 reserva.Estado = StatusReserva.delivered;
                 reserva.Entrega = registo;
                 reserva.Concluido = true;
-                reserva.Veiculo.Disponivel = true;
             }
             else
             {
