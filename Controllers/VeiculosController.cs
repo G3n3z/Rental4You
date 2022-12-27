@@ -118,7 +118,7 @@ namespace Rental4You.Models
 		}
 
 		// GET: Veiculos/Create
-		[Authorize(Roles = "Admin,Gestor, Funcionario")]
+		[Authorize(Roles = "Gestor, Funcionario")]
 		public IActionResult Create()
 		{
 			ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
