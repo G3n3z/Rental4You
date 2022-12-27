@@ -67,10 +67,10 @@ namespace Rental4You.Models
             }
             try
             {
-                string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/" + id.ToString());
+                string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Registos/" + id.ToString());
                 var files = from file in Directory.EnumerateFiles(CoursePath) select string.Format("/Ficheiros/{0}/{1}", id, Path.GetFileName(file));
                 ViewData["NFich"] = files.Count();
-                ViewData["Ficheiros"] = files;
+                ViewData["Ficheiro"] = files;
 
             }
             catch (Exception ex)
@@ -166,7 +166,7 @@ namespace Rental4You.Models
                     _context.Update(reserva.Veiculo);
                     await _context.SaveChangesAsync();
 
-                    string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/" + registo.Id.ToString());
+                    string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Registos/" + registo.Id.ToString());
 
                     if (!Directory.Exists(CoursePath))
                     {
