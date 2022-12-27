@@ -385,12 +385,8 @@ namespace Rental4You.Models
 
         }
 
-		public async Task<IActionResult> GraficoReservasDiarias()
-		{
-			return View();
-		}
-
         [HttpPost]
+        [Authorize(Roles = "Admin,Gestor")]
         public async Task<IActionResult> GetDadosReservasDiarias()
         {
 			List<object> dados = new List<object>();
@@ -407,6 +403,7 @@ namespace Rental4You.Models
                     Qtd = r.Count()
                 })
                 .ToListAsync();
+
             DataRow dr;
 			foreach(var reserva in dadosReservas)
             {
@@ -425,21 +422,17 @@ namespace Rental4You.Models
 			return Json(dados);
 		}
 
-		public async Task<IActionResult> GraficoReservasMensais()
-		{
-			return View();
-		}
-
+		[HttpPost]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetDadosReservasMensais()
 		{
-			//dados de exemplo
 			List<object> dados = new List<object>();
 			DataTable dt = new DataTable();
 			dt.Columns.Add("Reservas", Type.GetType("System.String"));
 			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
 
 			var dadosReservas = await _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddMonths(-12))
+				.Where(r => r.DataReserva >= DateTime.Now.AddMonths(-12) && r.DataReserva <= DateTime.Today)
 				.GroupBy(r => new {date = new DateOnly(r.DataReserva.Year, r.DataReserva.Month, 1)})
 				.Select(r => new
 				{
@@ -447,11 +440,123 @@ namespace Rental4You.Models
 					Qtd = r.Count()
 				})
 				.ToListAsync();
+
 			DataRow dr;
 			foreach (var reserva in dadosReservas)
 			{
 				dr = dt.NewRow();
 				dr["Reservas"] = reserva.Mes;
+				dr["Quantidade"] = reserva.Qtd;
+				dt.Rows.Add(dr);
+			}
+
+			foreach (DataColumn dc in dt.Columns)
+			{
+				List<object> x = new List<object>();
+				x = (from DataRow drr in dt.Rows select drr[dc.ColumnName]).ToList();
+				dados.Add(x);
+			}
+			return Json(dados);
+		}
+
+		[HttpPost]
+		[Authorize(Roles = "Gestor")]
+		public async Task<IActionResult> GetDadosFaturacaoSemanal()
+		{
+			List<object> dados = new List<object>();
+			DataTable dt = new DataTable();
+			dt.Columns.Add("Faturacao", Type.GetType("System.String"));
+			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
+
+			var dadosReservas = await _context.Reservas
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-7) && r.DataReserva <= DateTime.Today)
+				.GroupBy(r => r.DataReserva)
+				.Select(r => new
+				{
+					Data = new DateOnly(r.Key.Year, r.Key.Month, r.Key.Day),
+					Qtd = r.Sum(v => v.CustoTotal)
+				})
+				.ToListAsync();
+
+			DataRow dr;
+			foreach (var reserva in dadosReservas)
+			{
+				dr = dt.NewRow();
+				dr["Faturacao"] = reserva.Data;
+				dr["Quantidade"] = reserva.Qtd;
+				dt.Rows.Add(dr);
+			}
+
+			foreach (DataColumn dc in dt.Columns)
+			{
+				List<object> x = new List<object>();
+				x = (from DataRow drr in dt.Rows select drr[dc.ColumnName]).ToList();
+				dados.Add(x);
+			}
+			return Json(dados);
+		}
+
+		[HttpPost]
+		[Authorize(Roles = "Gestor")]
+		public async Task<IActionResult> GetDadosFaturacaoMensal()
+		{
+			List<object> dados = new List<object>();
+			DataTable dt = new DataTable();
+			dt.Columns.Add("Faturacao", Type.GetType("System.String"));
+			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
+
+			var dadosReservas = await _context.Reservas
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+				.GroupBy(r => r.DataReserva)
+				.Select(r => new
+				{
+					Data = new DateOnly(r.Key.Year, r.Key.Month, r.Key.Day),
+					Qtd = r.Sum(v => v.CustoTotal)
+				})
+				.ToListAsync();
+
+			DataRow dr;
+			foreach (var reserva in dadosReservas)
+			{
+				dr = dt.NewRow();
+				dr["Faturacao"] = reserva.Data;
+				dr["Quantidade"] = reserva.Qtd;
+				dt.Rows.Add(dr);
+			}
+
+			foreach (DataColumn dc in dt.Columns)
+			{
+				List<object> x = new List<object>();
+				x = (from DataRow drr in dt.Rows select drr[dc.ColumnName]).ToList();
+				dados.Add(x);
+			}
+			return Json(dados);
+		}
+
+		[HttpPost]
+		[Authorize(Roles = "Gestor")]
+		public async Task<IActionResult> GetDadosMediaReservasDiariasMensal()
+		{
+			List<object> dados = new List<object>();
+			DataTable dt = new DataTable();
+			dt.Columns.Add("Faturacao", Type.GetType("System.String"));
+			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
+
+			var dadosReservas = await _context.Reservas
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+				.GroupBy(r => r.DataReserva)
+				.Select(r => new
+				{
+					Data = new DateOnly(r.Key.Year, r.Key.Month, r.Key.Day),
+					Qtd = r.Sum(v => v.CustoTotal)/r.Count()
+				})
+				.ToListAsync();
+
+			DataRow dr;
+			foreach (var reserva in dadosReservas)
+			{
+				dr = dt.NewRow();
+				dr["Faturacao"] = reserva.Data;
 				dr["Quantidade"] = reserva.Qtd;
 				dt.Rows.Add(dr);
 			}
