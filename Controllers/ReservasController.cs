@@ -587,7 +587,7 @@ namespace Rental4You.Models
                 new SelectListItem() { Text = " ", Value = string.Empty },
                 new SelectListItem() { Text = "Pendente", Value = StatusReserva.pending.ToString() },
                 new SelectListItem() { Text = "Rejeitada", Value = StatusReserva.rejected.ToString() },
-                new SelectListItem() { Text = "Approvada", Value = StatusReserva.approved.ToString() },
+                new SelectListItem() { Text = "Aprovada", Value = StatusReserva.approved.ToString() },
                 new SelectListItem() { Text = "Levantada", Value = StatusReserva.provided.ToString() },
                 new SelectListItem() { Text = "Concluida", Value = StatusReserva.delivered.ToString() },
             };

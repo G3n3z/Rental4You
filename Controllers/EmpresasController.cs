@@ -179,7 +179,7 @@ namespace Rental4You.Models
 
         private bool IsValidEmail(string email)
         {
-            return Regex.IsMatch(email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+            return Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$", RegexOptions.IgnoreCase);
         }
 
         // POST: Empresas/Create
@@ -204,7 +204,7 @@ namespace Rental4You.Models
                 gestor.EmailConfirmed = true;
                 gestor.DataNascimento = new DateTime();
                 gestor.PrimeiroNome = "gestor";
-                gestor.UltimoNome = "gestor";
+                gestor.UltimoNome = empresa.Nome;
                 gestor.PhoneNumber = null;
                 gestor.NIF = "0000000";
                 gestor.UserName = gestor.Email;
