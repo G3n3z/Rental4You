@@ -7,6 +7,7 @@ using Rental4You.Models;
 using Rental4You.ViewModel;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 
 namespace Rental4You.Controllers
@@ -65,6 +66,28 @@ namespace Rental4You.Controllers
 		[Authorize(Roles = "Gestor")]
 		public async Task<IActionResult> DashboardGestor()
 		{
+            var faturacao7d = _context.Reservas
+                .Where(r => r.DataReserva >= DateTime.Now.AddDays(-7) && r.DataReserva <= DateTime.Today)
+                .Sum(r => r.CustoTotal);
+
+			var faturacao30d = _context.Reservas
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+				.Sum(r => r.CustoTotal);
+
+			double mediaDiaria = _context.Reservas
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+				.Count();
+
+            mediaDiaria /= _context.Reservas
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+                .GroupBy(r => r.DataReserva)
+                .Count();
+
+
+			ViewBag.faturacao7d = faturacao7d.ToString("C", CultureInfo.CurrentCulture);
+            ViewBag.faturacao30d = faturacao30d.ToString("C", CultureInfo.CurrentCulture);
+            ViewBag.mediaDiaria = mediaDiaria;
+
 			return View();
 		}
 
