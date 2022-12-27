@@ -39,7 +39,7 @@ else
 			<label>Ordenar por:</label>
 			<select name="order" asp-items=@ViewBag.Order class="form-group"></select>
 			<button type="submit" class="btn btn-success btn-sm">Pesquisar</button>
-		</div>		
+		</div>
 	</div>
 </form>
 <table class="table">
@@ -115,12 +115,34 @@ else
 				@if (User.IsInRole("Gestor") || User.IsInRole("Funcionario"))
 				{
 					<td>
-						<a asp-action="Details" asp-route-id="@item.Id" class="btn-sm btn-success btn-sm">Detalhes</a>
-						<a asp-action="Edit" asp-route-id="@item.Id" class="btn-sm btn-warning btn-sm">Editar</a>
-						@if (item.Reservas == null || item.Reservas.Count() == 0)
-						{
-							<a asp-action="Delete" asp-route-id="@item.Id" class="btn-sm btn-danger btn-sm">Remover</a>
-						}
+						<div class="row">
+							<div class="col-sm-auto">
+								<form asp-action="ChangeStatus" asp-controller="Veiculos" asp-route-Id="@item.Id">
+									@if (item.Disponivel)
+									{
+										<input type="hidden" name="Disponivel" value="false" />
+										<button type="submit" class="btn btn-warning btn-sm" style="width: 90px;">Desativar</button>
+									}
+									else
+									{
+										<input type="hidden" name="Disponivel" value="true" />
+										<button type="submit" class="btn btn-success btn-sm" style="width: 90px;">Activar</button>
+									}
+								</form>
+							</div>
+							<div class="col-sm-auto">
+								<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-success btn-sm">Detalhes</a>
+							</div>
+							<div class="col-sm-auto">
+								<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
+							</div>
+							@if (item.Reservas == null || item.Reservas.Count() == 0)
+							{
+								<div class="col-sm-auto">
+									<a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Remover</a>
+								</div>
+							}
+						</div>
 					</td>
 				}
 			</tr>
