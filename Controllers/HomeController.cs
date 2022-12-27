@@ -137,7 +137,7 @@ namespace Rental4You.Controllers
             }
             var veiculos = _context.Veiculos.Include(v => v.Empresa).Include(v => v.Empresa.Avaliacoes)
             .Include(v => v.Categoria).Where(veiculo => empresas.Contains(veiculo.EmpresaId));
-            veiculos = veiculos.Where(v => v.Empresa.Activo == true);
+            veiculos = veiculos.Where(v => v.Empresa.Activo == true && v.Disponivel == true);
             veiculos = veiculos.Include(v => v.Reservas)
                                         .Where(veiculo => veiculo.Reservas == null || 
                                                   veiculo.Reservas.Count() == 0 ||
