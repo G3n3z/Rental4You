@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Rental4You.Data;
 using Rental4You.Models;
 using Rental4You.ViewModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -150,8 +151,24 @@ namespace Rental4You.Controllers
                     veiculos = veiculos.OrderByDescending(v => v.Empresa.MediaAvaliacao);
                 }
             }
-            //veiculos = veiculos.GroupBy((veiculo) => new { veiculo.Marca, veiculo.Modelo, veiculo.EmpresaId }).Select(x => x.First());
             List<Veiculo> model = veiculos.ToList();
+            List<string> images = new List<string>();
+            for (int i = 0; i < model.Count(); i++) { 
+                try
+                {
+                    string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + model[i].Id.ToString());
+                    var files = from file in Directory.EnumerateFiles(CoursePath) select string.Format("/Ficheiros/Veiculos/{0}/{1}", model[i].Id, Path.GetFileName(file));
+
+                    images.Add(files.FirstOrDefault(""));
+
+                }
+                catch (Exception ex)
+                { images.Add(""); }
+            }
+            ViewData["NFich"] = images.Count();
+            ViewData["Ficheiros"] = images;
+
+            //veiculos = veiculos.GroupBy((veiculo) => new { veiculo.Marca, veiculo.Modelo, veiculo.EmpresaId }).Select(x => x.First());
             double dias = (pesquisa.DataEntrega - pesquisa.DataLevantamento).TotalHours / 24;
             SearchViewModel viewModels = new SearchViewModel();
             viewModels.Veiculos = new List<SearchVeiculosViewModel>();
