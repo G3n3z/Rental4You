@@ -25,7 +25,7 @@ namespace Rental4You.Models
 		}
 
 		// GET: Veiculos
-        [Authorize(Roles = "Admin,Gestor, Funcionario")]
+		[Authorize(Roles = "Admin,Gestor, Funcionario")]
 		public async Task<IActionResult> Index(string Categoria, StatusVeiculo? statusVeiculo, string order, string Marca)
 		{
 			var filtrosCategorias = GetFilterCategorias(_context.Categorias.ToList());
@@ -103,22 +103,22 @@ namespace Rental4You.Models
 			{
 				return NotFound();
 			}
-			
-            try
-            {
-                string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + id.ToString());
-                var files = from file in Directory.EnumerateFiles(CoursePath) select string.Format("/Ficheiros/Veiculos/{0}/{1}", id, Path.GetFileName(file));
-                ViewData["NFich"] = files.Count();
-                ViewData["Ficheiro"] = files.FirstOrDefault("");
 
-            }
-            catch (Exception ex)
-            {}
-            return View(veiculo);
+			try
+			{
+				string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + id.ToString());
+				var files = from file in Directory.EnumerateFiles(CoursePath) select string.Format("/Ficheiros/Veiculos/{0}/{1}", id, Path.GetFileName(file));
+				ViewData["NFich"] = files.Count();
+				ViewData["Ficheiro"] = files.FirstOrDefault("");
+
+			}
+			catch (Exception ex)
+			{ }
+			return View(veiculo);
 		}
 
 		// GET: Veiculos/Create
-		[Authorize(Roles = "Admin,Gestor, Funcionario")]
+		[Authorize(Roles = "Gestor, Funcionario")]
 		public IActionResult Create()
 		{
 			ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
@@ -140,8 +140,8 @@ namespace Rental4You.Models
 
 			ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
 			ModelState.Remove(nameof(veiculo.Empresa));
-            ModelState.Remove(nameof(veiculo.Disponivel));
-            ModelState.Remove(nameof(veiculo.Reservas));
+			ModelState.Remove(nameof(veiculo.Disponivel));
+			ModelState.Remove(nameof(veiculo.Reservas));
 			veiculo.Disponivel = true;
 
 			if (veiculo.EmpresaId == -1)
@@ -153,37 +153,39 @@ namespace Rental4You.Models
 				}
 				else
 				{
-					ModelState.AddModelError("", "Nao foi poss�vel criar o veiculo!");
+					ModelState.AddModelError("", "Nao foi possivel criar o veiculo!");
 					return View(veiculo);
 				}
 			}
+
+			if (ficheiro != null && ficheiro.Length > 0)
+			{
+				string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + veiculo.Id.ToString());
+
+				if (!Directory.Exists(CoursePath))
+				{
+					Directory.CreateDirectory(CoursePath);
+				}
+
+				var filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
+				while (System.IO.File.Exists(filePath))
+				{
+					filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
+				}
+				using (var stream = System.IO.File.Create(filePath))
+				{
+					await ficheiro.CopyToAsync(stream);
+				}
+			}
+
+			ModelState.Remove(nameof(ficheiro));
 
 			if (ModelState.IsValid)
 			{
 				_context.Add(veiculo);
 				await _context.SaveChangesAsync();
 
-                string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + veiculo.Id.ToString());
-
-                if (!Directory.Exists(CoursePath))
-                {
-                    Directory.CreateDirectory(CoursePath);
-                }
-                
-                if (ficheiro != null && ficheiro.Length > 0)
-                {
-                    var filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
-                    while (System.IO.File.Exists(filePath))
-                    {
-                        filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
-                    }
-                    using (var stream = System.IO.File.Create(filePath))
-                    {
-                        await ficheiro.CopyToAsync(stream);
-                    }
-                }
-
-                return RedirectToAction(nameof(Index));
+				return RedirectToAction(nameof(Index));
 			}
 
 			return View(veiculo);
@@ -203,17 +205,17 @@ namespace Rental4You.Models
 			{
 				return NotFound();
 			}
-            try
-            {
-                string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + id.ToString());
-                var files = from file in Directory.EnumerateFiles(CoursePath) select string.Format("/Ficheiros/Veiculos/{0}/{1}", id, Path.GetFileName(file));
-                ViewData["NFich"] = files.Count();
-                ViewData["Ficheiro"] = files.FirstOrDefault("");
+			try
+			{
+				string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + id.ToString());
+				var files = from file in Directory.EnumerateFiles(CoursePath) select string.Format("/Ficheiros/Veiculos/{0}/{1}", id, Path.GetFileName(file));
+				ViewData["NFich"] = files.Count();
+				ViewData["Ficheiro"] = files.FirstOrDefault("");
 
-            }
-            catch (Exception ex)
-            { }
-            ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
+			}
+			catch (Exception ex)
+			{ }
+			ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
 			ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
 
 			return View(veiculo);
@@ -239,16 +241,17 @@ namespace Rental4You.Models
 			ModelState.Remove(nameof(veiculo.Empresa));
 
 			ModelState.Remove(nameof(veiculo.Reservas));
-            ModelState.Remove(nameof(ficheiro));
-            if (ModelState.IsValid)
+			ModelState.Remove(nameof(ficheiro));
+			if (ModelState.IsValid)
 			{
 				try
 				{
 					_context.Update(veiculo);
 					await _context.SaveChangesAsync();
-                    try
-                    {
-						if(ficheiro != null) { 
+					try
+					{
+						if (ficheiro != null)
+						{
 							string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + id.ToString());
 							System.IO.DirectoryInfo di = new DirectoryInfo(path);
 
@@ -256,31 +259,31 @@ namespace Rental4You.Models
 							{
 								file.Delete();
 							}
-                        }
-                    }
-                    catch (Exception ex)
-                    { }
-                    string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + veiculo.Id.ToString());
-                    if (!Directory.Exists(CoursePath))
-                    {
-                        Directory.CreateDirectory(CoursePath);
-                    }
+						}
+					}
+					catch (Exception ex)
+					{ }
+					string CoursePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Ficheiros/Veiculos/" + veiculo.Id.ToString());
+					if (!Directory.Exists(CoursePath))
+					{
+						Directory.CreateDirectory(CoursePath);
+					}
 
 
 
-                    if (ficheiro != null && ficheiro.Length > 0)
-                    {
-                        var filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
-                        while (System.IO.File.Exists(filePath))
-                        {
-                            filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
-                        }
-                        using (var stream = System.IO.File.Create(filePath))
-                        {
-                            await ficheiro.CopyToAsync(stream);
-                        }
-                    }
-                }
+					if (ficheiro != null && ficheiro.Length > 0)
+					{
+						var filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
+						while (System.IO.File.Exists(filePath))
+						{
+							filePath = Path.Combine(CoursePath, Guid.NewGuid().ToString() + Path.GetExtension(ficheiro.FileName));
+						}
+						using (var stream = System.IO.File.Create(filePath))
+						{
+							await ficheiro.CopyToAsync(stream);
+						}
+					}
+				}
 				catch (DbUpdateConcurrencyException)
 				{
 					if (!VeiculoExists(veiculo.Id))
@@ -349,6 +352,30 @@ namespace Rental4You.Models
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
+
+		[HttpPost]
+		[Authorize(Roles = "Gestor, Funcionario")]
+		public async Task<IActionResult> ChangeStatus(int? Id, [Bind("Disponivel")] bool Disponivel)
+		{
+			if (Id == null || _context.Veiculos == null)
+			{
+				return NotFound();
+			}
+
+			var veiculo = _context.Veiculos.FirstOrDefault(v => v.Id == Id);
+
+			if (veiculo == null)
+			{
+				return NotFound();
+			}
+
+			veiculo.Disponivel = Disponivel;
+
+			_context.Update(veiculo);
+			await _context.SaveChangesAsync();
+			return RedirectToAction("Index");
+		}
+
 		private IEnumerable<SelectListItem> GetFilterCategorias(List<Categoria> categorias)
 		{
 			var filter = categorias.Select(categoria => categoria.Nome).Distinct().ToArray();
@@ -369,7 +396,7 @@ namespace Rental4You.Models
 			};
 			foreach (var marca in marcas)
 			{
-				if(!string.IsNullOrWhiteSpace(marca))
+				if (!string.IsNullOrWhiteSpace(marca))
 					listItems.Add(new SelectListItem(marca, marca));
 			}
 			return listItems;

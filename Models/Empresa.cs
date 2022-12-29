@@ -7,7 +7,8 @@ namespace Rental4You.Models
     {
         public int Id { get; set; }
 
-        public string Nome { get; set; }
+		[RegularExpression(@"[a-zA-Z0-9-]+$", ErrorMessage = "Não podem ser usados caractéres especiais ou com acentuação")]
+		public string Nome { get; set; }
 
         public string Localidade { get; set; }
 

@@ -4,8 +4,8 @@
 }
 <h1>Dashboard</h1>
 <hr />
+<br />
 <div>
-	<br />
 	<h2>Reservas nos últimos 30 dias</h2>
 	<br />
 	<canvas id="chartGraficoReservasDiarias"></canvas>
@@ -51,6 +51,15 @@
 						responsive: true,
 						title: { display: true, text: 'Reservas Diarias' },
 						legend: { position: 'bottom' },
+						scales: {
+							x: {
+								ticks: {
+									autoSkip: false,
+									maxRotation: 45,
+									minRotation: 45
+								}
+							}
+						}
 					}
 				});
 			}
@@ -83,6 +92,15 @@
 						responsive: true,
 						title: { display: true, text: 'Reservas Mensais' },
 						legend: { position: 'bottom' },
+						scales: {
+							x: {
+								ticks: {
+									autoSkip: false,
+									maxRotation: 45,
+									minRotation: 45
+								}
+							}
+						}
 					}
 				});
 			}
@@ -115,6 +133,15 @@
 						responsive: true,
 						title: { display: true, text: 'Novos Utilizadores Mensais' },
 						legend: { position: 'bottom' },
+						scales: {
+							x: {
+								ticks: {
+									autoSkip: false,
+									maxRotation: 45,
+									minRotation: 45
+								}
+							}
+						}
 					}
 				});
 			}

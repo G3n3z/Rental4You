@@ -4,128 +4,31 @@
 }
 <h1>Dashboard</h1>
 <hr />
+<br />
+<div class="row justify-content-md-center">
+	<div class="col">
+		<h4>Faturação nos últimos 7 dias: </h4>
+		<h2 align="center">@ViewBag.faturacao7d</h2>
+	</div>
+	<div class="col">
+		<h4>Faturação nos últimos 30 dias: </h4>
+		<h2 align="center">@ViewBag.faturacao30d</h2>
+	</div>
+	<div class="col-5">
+		<h4>Média de reservas diárias nos últimos 30 dias:</h4>
+		<h2 align="center">@ViewBag.mediaDiaria</h2>
+	</div>
+</div>
+<br />
+<hr />
+<br />
 <div>
-	<br />
-	<h2>Faturação nos últimos 7 dias</h2>
-	<br />
-	<canvas id="chartGraficoFaturacaoSemanal"></canvas>
-	<br />
-	<hr />
-	<br />
-	<h2>Faturação nos últimos 30 dias</h2>
-	<br />
-	<canvas id="chartGraficoFaturacaoMensal"></canvas>
-	<br />
-	<hr />
-	<br />
-	<h2>Média de reservas diárias nos últimos 30 dias</h2>
-	<br />
-	<canvas id="chartGraficoMediaReservasDiariasMensal"></canvas>
-	<br />
-	<hr />
-	<br />
 	<h2>Reservas nos últimos 30 dias</h2>
 	<br />
 	<canvas id="chartGraficoReservasDiarias"></canvas>
 </div>
 @section Scripts {
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script>
-		$.ajax({
-			type: "POST",
-			url: "/Reservas/GetDadosFaturacaoSemanal",
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
-			success: function (data) {
-				let Labels = data[0];
-				let Datasets1 = data[1];
-				let dataT = {
-					labels: Labels,
-					datasets: [{
-						label: "Datas",
-						data: Datasets1,
-						fill: false,
-						borderWidth: 1,
-						backgroundColor: getRandomColor()
-					}]
-				};
-				let ctx = $("#chartGraficoFaturacaoSemanal").get(0).getContext("2d");
-				let myNewChart = new Chart(ctx, {
-					type: 'bar',
-					data: dataT,
-					options: {
-						responsive: true,
-						title: { display: true, text: 'Reservas Diarias' },
-						legend: { position: 'bottom' },
-					}
-				});
-			}
-		});
-	</script>
-	<script>
-		$.ajax({
-			type: "POST",
-			url: "/Reservas/GetDadosFaturacaoMensal",
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
-			success: function (data) {
-				let Labels = data[0];
-				let Datasets1 = data[1];
-				let dataT = {
-					labels: Labels,
-					datasets: [{
-						label: "Datas",
-						data: Datasets1,
-						fill: false,
-						borderWidth: 1,
-						backgroundColor: getRandomColor()
-					}]
-				};
-				let ctx = $("#chartGraficoFaturacaoMensal").get(0).getContext("2d");
-				let myNewChart = new Chart(ctx, {
-					type: 'bar',
-					data: dataT,
-					options: {
-						responsive: true,
-						title: { display: true, text: 'Reservas Mensais' },
-						legend: { position: 'bottom' },
-					}
-				});
-			}
-		});
-	</script>
-	<script>
-		$.ajax({
-			type: "POST",
-			url: "/Reservas/GetDadosMediaReservasDiariasMensal",
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
-			success: function (data) {
-				let Labels = data[0];
-				let Datasets1 = data[1];
-				let dataT = {
-					labels: Labels,
-					datasets: [{
-						label: "Datas",
-						data: Datasets1,
-						fill: false,
-						borderWidth: 1,
-						backgroundColor: getRandomColor()
-					}]
-				};
-				let ctx = $("#chartGraficoMediaReservasDiariasMensal").get(0).getContext("2d");
-				let myNewChart = new Chart(ctx, {
-					type: 'bar',
-					data: dataT,
-					options: {
-						responsive: true,
-						title: { display: true, text: 'Novos Utilizadores Mensais' },
-						legend: { position: 'bottom' },
-					}
-				});
-			}
-		});
-	</script>
 	<script>
 		$.ajax({
 			type: "POST",
@@ -153,21 +56,30 @@
 						responsive: true,
 						title: { display: true, text: 'Reservas Diarias' },
 						legend: { position: 'bottom' },
+						scales: {
+							x: {
+								ticks: {
+									autoSkip: false,
+									maxRotation: 45,
+									minRotation: 45
+								}
+							}
+						}
 					}
 				});
 			}
 		});
 	</script>
 	<script>
-		function getRandomColor(){
+		function getRandomColor() {
 			let characters = '0123456789ABCDEF'.split('');
 			let colors = [];
-			for(let k = 0; k < 12; k++){
+			for (let k = 0; k < 12; k++) {
 				let color = '#';
-				for (let i = 0; i < 6; i++){
+				for (let i = 0; i < 6; i++) {
 					color += characters[Math.floor(Math.random() * 16)];
 				}
-				color += '66';
+				color += '77';
 				colors.push(color);
 			}
 			return colors;

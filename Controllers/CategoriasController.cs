@@ -21,6 +21,7 @@ namespace Rental4You.Models
 		}
 
 		// GET: Categorias
+		[Authorize(Roles = "Admin, Gestor, Funcionario")]
 		public async Task<IActionResult> Index()
 		{
 			return _context.Categorias != null ?
@@ -29,6 +30,7 @@ namespace Rental4You.Models
 		}
 
 		// GET: Categorias/Details/5
+		[Authorize(Roles = "Admin, Gestor, Funcionario")]
 		public async Task<IActionResult> Details(int? id)
 		{
 			if (id == null || _context.Categorias == null)

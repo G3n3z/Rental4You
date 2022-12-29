@@ -12,6 +12,7 @@ namespace Rental4You.ViewModel
         public DateTime? DataLevantamento {get; set;}
         public DateTime? DataEntrega {get; set;}
         public string NomeCliente {get; set;}
+        public string NomeEmpresa {get; set;}
         public string Veiculo {get; set;}
         public string Estado {get; set;}
         public string Categoria {get; set;}

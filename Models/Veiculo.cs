@@ -26,10 +26,7 @@ namespace Rental4You.Models
         [RegularExpression(@"[A-Z\d]{6}", ErrorMessage = "Matrícula inválida")]
         [Required(ErrorMessage = "Necessita indicar a matrícula")]
         public string Matricula {get; set;}
-
-		[DisplayName("Localização")]
-		public string Localizacao { get; set; }
-
+        
         [DisplayName("Custo por dia")]
 		[DataType(DataType.Currency)]
 		public double CustoDia { get; set; }
