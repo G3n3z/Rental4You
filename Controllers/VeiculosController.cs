@@ -473,7 +473,7 @@ namespace Rental4You.Models
 					}
 				case "categoria asc":
 					{
-						veiculos = veiculos.OrderByDescending(v => v.Categoria.Nome);
+						veiculos = veiculos.OrderBy(v => v.Categoria.Nome);
 						break;
 					}
 				case "categoria desc":

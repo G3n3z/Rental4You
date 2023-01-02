@@ -95,17 +95,18 @@ namespace Rental4You.Controllers
         {
             ViewData["pesquisa"] = pesquisa;
             
-            ViewData["Empresas"] = GetFilterEmpresas(_context.Empresas.ToList());
             ViewData["Categorias"] = GetFilterCategorias(_context.Categorias.ToList());
             ViewData["Order"] = GetOrders();
 
             if (string.IsNullOrWhiteSpace(pesquisa.Localizacao))
             {
+                ViewData["Empresas"] = GetFilterEmpresas(_context.Empresas.ToList());
                 ModelState.AddModelError("Localizacao", "Necessita indicar uma localização.");
                 return View("Search", pesquisa);
             }
             
             var empresasList = _context.Empresas.Where(empresa => empresa.Localidade.Contains(pesquisa.Localizacao)).Include(empresa => empresa.Veiculos).ToList();
+            ViewData["Empresas"] = GetFilterEmpresas(empresasList);
             if (empresasList == null || empresasList.Count() == 0)
             {
                 //Verificar se nao da erro
