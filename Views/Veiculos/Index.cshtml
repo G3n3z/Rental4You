@@ -33,6 +33,10 @@ else
 			<label>Estado:</label>
 			<select name="statusVeiculo" asp-items=@ViewBag.Estado class="form-group"></select>
 		</div>
+		<div class="col-1 form-group mb-2">
+			<label>Ativo:</label>
+			<select name="Ativo" asp-items=@ViewBag.Ativo class="form-group"></select>
+		</div>
 	</div>
 	<div class="row">
 		<div class="col-4 form-group mb-2">
@@ -64,7 +68,7 @@ else
 				@Html.DisplayNameFor(model => model.CustoDia)
 			</th>
 			<th>
-				@Html.DisplayNameFor(model => model.Disponivel)
+				@Html.DisplayNameFor(model => model.Ativo)
 			</th>
 			@if (User.IsInRole("Admin"))
 			{
@@ -75,7 +79,12 @@ else
 			<th>
 				@Html.DisplayNameFor(model => model.Categoria)
 			</th>
-			<th></th>
+			@if (User.IsInRole("Gestor") || User.IsInRole("Funcionario"))
+			{
+				<th>
+					Ações
+				</th>
+			}
 		</tr>
 	</thead>
 	<tbody>
@@ -101,7 +110,7 @@ else
 					@Html.DisplayFor(modelItem => item.CustoDia)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.Disponivel)
+					@Html.DisplayFor(modelItem => item.Ativo)
 				</td>
 				@if (User.IsInRole("Admin"))
 				{
@@ -118,14 +127,14 @@ else
 						<div class="row">
 							<div class="col-sm-auto">
 								<form asp-action="ChangeStatus" asp-controller="Veiculos" asp-route-Id="@item.Id">
-									@if (item.Disponivel)
+									@if (item.Ativo)
 									{
-										<input type="hidden" name="Disponivel" value="false" />
+										<input type="hidden" name="Ativo" value="false" />
 										<button type="submit" class="btn btn-warning btn-sm" style="width: 90px;">Desativar</button>
 									}
 									else
 									{
-										<input type="hidden" name="Disponivel" value="true" />
+										<input type="hidden" name="Ativo" value="true" />
 										<button type="submit" class="btn btn-success btn-sm" style="width: 90px;">Activar</button>
 									}
 								</form>
