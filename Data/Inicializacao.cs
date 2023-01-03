@@ -215,7 +215,7 @@ namespace Escola_Segura.Data
             v.Marca = "Renault";
             v.Modelo = "Megane";
             v.Nome = v.Marca + " " + v.Modelo;
-            v.Disponivel = true;
+            v.Ativo = true;
             v.Descricao = "Gasolina 1.5 5 portas";
             v.CustoDia = 25;
             v.Matricula = "AA58XX";
@@ -227,7 +227,7 @@ namespace Escola_Segura.Data
             v1.Modelo = "Sport";
             v1.Nome = v1.Marca + " " + v1.Modelo;
             v1.Descricao = "Gasolina 2.5 5 portas";
-            v1.Disponivel = true;
+            v1.Ativo = true;
             v1.CustoDia = 35;
             v1.Matricula = "DD46ZZ";
 
@@ -239,7 +239,7 @@ namespace Escola_Segura.Data
             v2.Marca = "Pegeot";
             v2.Modelo = "508";
             v2.Nome = v2.Marca + " " + v2.Modelo;
-            v2.Disponivel = true;
+            v2.Ativo = true;
             v2.Descricao = "Gasolina 2.0 5 portas";
             v2.CustoDia = 20;
             v2.Matricula = "OO46DD";
@@ -251,7 +251,7 @@ namespace Escola_Segura.Data
             v3.Marca = "Renault";
             v3.Modelo = "Megane";
             v3.Nome = v3.Marca + " " + v3.Modelo;
-            v3.Disponivel = true;
+            v3.Ativo = true;
             v3.Descricao = "Gasoleo 1.5 5 portas";
             v3.CustoDia = 23;
             v3.Matricula = "XX87DF";
@@ -263,7 +263,7 @@ namespace Escola_Segura.Data
             v4.Modelo = "C3";
             v4.Descricao = "Gasolina 1.0 3 portas";
             v4.Nome = v4.Marca + " " + v4.Modelo;
-            v4.Disponivel = true;
+            v4.Ativo = true;
             v4.CustoDia = 10;
             v4.Matricula = "EE76DD";
 
@@ -274,7 +274,7 @@ namespace Escola_Segura.Data
             v5.Modelo = "Clio";
             v5.Descricao = "Gasolina 1.2";
             v5.Nome = v5.Marca + " " + v5.Modelo;
-            v5.Disponivel = true;
+            v5.Ativo = true;
             v5.CustoDia = 12;
             v5.Matricula = "OOUU66";
 
