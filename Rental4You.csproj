@@ -25,9 +25,9 @@
     <None Remove="Microsoft.EntityFrameworkCore.Sqlite" />
     <None Remove="Swashbuckle.AspNetCore" />
     <None Remove="Views\Users\" />
-    <None Remove="ViewModel\" />
+    <None Remove="Validations\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewModel\" />
+    <Folder Include="Validations\" />
   </ItemGroup>
 </Project>

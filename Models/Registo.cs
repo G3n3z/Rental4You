@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Rental4You.Validations;
 
 namespace Rental4You.Models
 {
@@ -14,6 +15,7 @@ namespace Rental4You.Models
         public int Id { get; set; }
         public DateTime Data { get; set; }
 
+        [KmsReserva]
         [Range(0, Double.PositiveInfinity, ErrorMessage ="O valor deve ser superior a 0")]
         public double Kms { get; set; }
         public bool Danos { get; set; }

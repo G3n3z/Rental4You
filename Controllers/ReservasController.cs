@@ -90,7 +90,7 @@ namespace Rental4You.Models
 
 			if (reservas != null && !String.IsNullOrEmpty(viewModel.Veiculo))
 			{
-				reservas = reservas.Where(r => (r.Veiculo.Nome.Contains(viewModel.Veiculo)));
+				reservas = reservas.Where(r => (r.Veiculo.Nome.Contains(viewModel.Veiculo) || r.Veiculo.Marca.Contains(viewModel.Veiculo) || r.Veiculo.Modelo.Contains(viewModel.Veiculo)));
 			}
 
 			if (reservas != null && !String.IsNullOrEmpty(viewModel.Estado))

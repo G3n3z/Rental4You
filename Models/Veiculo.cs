@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Rental4You.Validations;
+
 namespace Rental4You.Models
 {
     public enum StatusVeiculo
@@ -23,6 +25,7 @@ namespace Rental4You.Models
 
         [DisplayName("Matrícula")]
 		[StringLength(6)]
+        [MatriculaUnique]
         [RegularExpression(@"[A-Z\d]{6}", ErrorMessage = "Matrícula inválida")]
         [Required(ErrorMessage = "Necessita indicar a matrícula")]
         public string Matricula {get; set;}

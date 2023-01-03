@@ -8,4 +8,4 @@
   DELETE from Reservas;
   DELETE from Veiculos;
   Delete from Categorias;
-  
+  Delete from Empresas;

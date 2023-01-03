@@ -32,7 +32,8 @@ namespace Escola_Segura.Data
                 UltimoNome = "Admin",
                 NIF = "11111111",
                 EmailConfirmed = true,
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Active = true
             };
             var user = await userManager.FindByEmailAsync(defaultUser.Email);
             if (user == null)
@@ -50,6 +51,7 @@ namespace Escola_Segura.Data
             empresa1.Activo = true;
             empresa1.Localidade = "Coimbra";
             empresa1.Nome = "RentaCoimbra";
+            empresa1.MediaAvaliacao = -1;
             context.Add(empresa1);
 
 
@@ -57,6 +59,7 @@ namespace Escola_Segura.Data
             empresa2.Activo = true;
             empresa2.Localidade = "Coimbra";
             empresa2.Nome = "RentaEiras";
+            empresa2.MediaAvaliacao = -1;
             context.Add(empresa2);
             await context.SaveChangesAsync();
 
@@ -64,6 +67,7 @@ namespace Escola_Segura.Data
             empresa3.Activo = true;
             empresa3.Localidade = "Porto";
             empresa3.Nome = "RentaPorto";
+            empresa3.MediaAvaliacao = -1;
             context.Add(empresa3);
             await context.SaveChangesAsync();
 
@@ -76,7 +80,8 @@ namespace Escola_Segura.Data
                 NIF = "11111111",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                EmpresaId = empresa1.Id
+                EmpresaId = empresa1.Id,
+                Active = true
             };
 
 
@@ -90,7 +95,8 @@ namespace Escola_Segura.Data
                 NIF = "11111111",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                EmpresaId = empresa2.Id
+                EmpresaId = empresa2.Id,
+                Active = true
             };
 
             var user5 = new ApplicationUser
@@ -102,7 +108,8 @@ namespace Escola_Segura.Data
                 NIF = "11111111",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                EmpresaId = empresa3.Id
+                EmpresaId = empresa3.Id,
+                Active = true
             };
 
 
@@ -130,20 +137,22 @@ namespace Escola_Segura.Data
                 NIF = "11111111",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                EmpresaId = empresa1.Id
+                EmpresaId = empresa2.Id,
+                Active = true
             };
 
 
             var user4 = new ApplicationUser
             {
                 UserName = "func@rentacoimbra.com",
-                Email = "daniel@rentacoimbra.com",
+                Email = "func@rentacoimbra.com",
                 PrimeiroNome = "Daniel",
                 UltimoNome = "Americo",
                 NIF = "11111111",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                EmpresaId = empresa2.Id
+                EmpresaId = empresa1.Id,
+                Active = true
             };
 
 
@@ -157,6 +166,36 @@ namespace Escola_Segura.Data
             //var empresa1 = context.Empresas.Where(v => v.Nome == "RentaCoimbra").First();
             //var empresa2 = context.Empresas.Where(v => v.Nome == "RentaEiras").First();
 
+            var user6 = new ApplicationUser
+            {
+                UserName = "daniel@fake.com",
+                Email = "daniel@fake.com",
+                PrimeiroNome = "Daniel",
+                UltimoNome = "Fernandes",
+                NIF = "12345678",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Active = true
+            };
+
+            var user7 = new ApplicationUser
+            {
+                UserName = "hugo@fake.com",
+                Email = "hugo@fake.com",
+                PrimeiroNome = "Hugo",
+                UltimoNome = "Jorge",
+                NIF = "12348678",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Active = true
+            };
+            await userManager.CreateAsync(user6, "Asd123!");
+            await userManager.AddToRoleAsync(user6,
+           Roles.Cliente.ToString());
+
+            await userManager.CreateAsync(user7, "Asd123!");
+            await userManager.AddToRoleAsync(user7,
+           Roles.Cliente.ToString());
 
             Categoria categoria = new Categoria();
             categoria.Nome = "Jeep";
@@ -208,7 +247,7 @@ namespace Escola_Segura.Data
 
             Veiculo v3 = new Veiculo();
             v3.EmpresaId = empresa2.Id;
-            v3.CategoriaId = categoria2.Id;
+            v3.CategoriaId = categoria1.Id;
             v3.Marca = "Renault";
             v3.Modelo = "Megane";
             v3.Nome = v3.Marca + " " + v3.Modelo;
