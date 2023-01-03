@@ -39,9 +39,9 @@ namespace Rental4You.Models
                 case StatusReserva.approved:
                     return "Aprovado";
                 case StatusReserva.delivered:
-                    return "Levantada";
-                case StatusReserva.provided:
                     return "Concluida";
+                case StatusReserva.provided:
+                    return "Levantada"; 
                 case StatusReserva.rejected:
                     return "Rejeitado";
                 default: 
