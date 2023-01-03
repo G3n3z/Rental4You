@@ -26,10 +26,11 @@ namespace Rental4You.Models
 
 		// GET: Veiculos
 		[Authorize(Roles = "Admin,Gestor, Funcionario")]
-		public async Task<IActionResult> Index(string Categoria, StatusVeiculo? statusVeiculo, string order, string Marca)
+		public async Task<IActionResult> Index(string Categoria, StatusVeiculo? statusVeiculo, string order, string Marca, string Ativo)
 		{
 			var filtrosCategorias = GetFilterCategorias(_context.Categorias.ToList());
 			var filtrosEstado = GetFilterEstado();
+			var filtrosAtivo = GetFilterAtivo();
 			var OrderList = GetOrder();
 			var filtrosMarcas = GetMarcasFilters(_context.Veiculos.ToList());
 			IQueryable<Veiculo>? veiculos = null;
@@ -63,21 +64,33 @@ namespace Rental4You.Models
 				}
 				filtrosEstado = SelectListItem(statusVeiculo.ToString(), filtrosEstado);
 			}
-			if (veiculos != null && !String.IsNullOrEmpty(order))
-			{
-				veiculos = OrderBy(order, veiculos);
-				OrderList = SelectListItem(order, OrderList);
-			}
 			if (veiculos != null && !string.IsNullOrWhiteSpace(Marca))
 			{
 				veiculos = veiculos.Where(v => v.Marca == Marca);
 				filtrosMarcas = SelectListItem(Marca, filtrosMarcas);
 			}
-
+			if (veiculos != null && Ativo != null)
+			{
+				if (Ativo == "ativo")
+				{
+					veiculos = veiculos.Where(v => v.Ativo == true);
+				}
+				else
+				{
+					veiculos = veiculos.Where(v => v.Ativo == false);
+				}
+				filtrosAtivo = SelectListItem(Ativo, filtrosAtivo);
+			}
+			if (veiculos != null && !String.IsNullOrEmpty(order))
+			{
+				veiculos = OrderBy(order, veiculos);
+				OrderList = SelectListItem(order, OrderList);
+			}
 
 			model = veiculos?.ToList();
 			ViewData["Categorias"] = filtrosCategorias;
 			ViewData["Estado"] = filtrosEstado;
+			ViewData["Ativo"] = filtrosAtivo;
 			ViewData["Order"] = OrderList;
 			ViewData["Marcas"] = filtrosMarcas;
 			return View(model);
@@ -133,16 +146,16 @@ namespace Rental4You.Models
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Roles = "Gestor, Funcionario")]
-		public async Task<IActionResult> Create([Bind("Id,Nome,Marca,Modelo,Descricao,Matricula,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo, [FromForm] IFormFile ficheiro)
+		public async Task<IActionResult> Create([Bind("Id,Nome,Marca,Modelo,Descricao,Matricula,Localizacao,CustoDia,Ativo,EmpresaId,CategoriaId")] Veiculo veiculo, [FromForm] IFormFile ficheiro)
 		{
 			ViewData["ListaDeCategorias"] = new SelectList(_context.Categorias.ToList(), "Id", "Nome");
 			ModelState.Remove(nameof(veiculo.Categoria));
 
 			ViewData["ListaDeEmpresas"] = new SelectList(_context.Empresas.ToList(), "Id", "Nome");
 			ModelState.Remove(nameof(veiculo.Empresa));
-			ModelState.Remove(nameof(veiculo.Disponivel));
+			ModelState.Remove(nameof(veiculo.Ativo));
 			ModelState.Remove(nameof(veiculo.Reservas));
-			veiculo.Disponivel = true;
+			veiculo.Ativo = true;
 
 			if (veiculo.EmpresaId == -1)
 			{
@@ -227,7 +240,7 @@ namespace Rental4You.Models
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Authorize(Roles = "Gestor, Funcionario")]
-		public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Marca,Modelo,Descricao,Matricula,Localizacao,CustoDia,Disponivel,EmpresaId,CategoriaId")] Veiculo veiculo, [FromForm] IFormFile ficheiro)
+		public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Marca,Modelo,Descricao,Matricula,Localizacao,CustoDia,Ativo,EmpresaId,CategoriaId")] Veiculo veiculo, [FromForm] IFormFile ficheiro)
 		{
 			if (id != veiculo.Id)
 			{
@@ -355,7 +368,7 @@ namespace Rental4You.Models
 
 		[HttpPost]
 		[Authorize(Roles = "Gestor, Funcionario")]
-		public async Task<IActionResult> ChangeStatus(int? Id, [Bind("Disponivel")] bool Disponivel)
+		public async Task<IActionResult> ChangeStatus(int? Id, [Bind("Ativo")] bool Ativo)
 		{
 			if (Id == null || _context.Veiculos == null)
 			{
@@ -369,7 +382,7 @@ namespace Rental4You.Models
 				return NotFound();
 			}
 
-			veiculo.Disponivel = Disponivel;
+			veiculo.Ativo = Ativo;
 
 			_context.Update(veiculo);
 			await _context.SaveChangesAsync();
@@ -409,6 +422,14 @@ namespace Rental4You.Models
 				new SelectListItem() { Text = "A Circular", Value = StatusVeiculo.A_CIRCULAR.ToString() }
 			};
 		}
+		private IEnumerable<SelectListItem> GetFilterAtivo()
+		{
+			return new SelectListItem[]{
+				new SelectListItem() { Text = " ", Value = string.Empty },
+				new SelectListItem() { Text = "Ativo", Value = "ativo" },
+				new SelectListItem() { Text = "Inativo", Value = "inativo" }
+			};
+		}
 
 		private IEnumerable<SelectListItem> GetOrder()
 		{
@@ -420,8 +441,8 @@ namespace Rental4You.Models
 				new SelectListItem() { Text = "Marca Desc", Value = "marca desc" },
 				new SelectListItem() { Text = "Custo Asc", Value = "custo dia asc" },
 				new SelectListItem() { Text = "Custo Desc", Value = "custo dia desc" },
-				new SelectListItem() { Text = "Disponivel Asc", Value = "disponibilidade asc" },
-				new SelectListItem() { Text = "Disponivel Desc", Value = "disponibilidade desc" },
+				new SelectListItem() { Text = "Ativo Asc", Value = "ativo asc" },
+				new SelectListItem() { Text = "Ativo Desc", Value = "ativo desc" },
 				new SelectListItem() { Text = "Categoria Asc", Value = "categoria asc" },
 				new SelectListItem() { Text = "Categoria Desc", Value = "categoria desc" },
 			};
@@ -461,14 +482,14 @@ namespace Rental4You.Models
 						veiculos = veiculos.OrderByDescending(v => v.CustoDia);
 						break;
 					}
-				case "disponibilidade asc":
+				case "ativo asc":
 					{
-						veiculos = veiculos.OrderBy(v => v.Disponivel);
+						veiculos = veiculos.OrderBy(v => v.Ativo);
 						break;
 					}
-				case "disponibilidade desc":
+				case "ativo desc":
 					{
-						veiculos = veiculos.OrderByDescending(v => v.Disponivel);
+						veiculos = veiculos.OrderByDescending(v => v.Ativo);
 						break;
 					}
 				case "categoria asc":

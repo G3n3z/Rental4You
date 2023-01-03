@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Rental4You.Validations;
@@ -13,6 +14,9 @@ namespace Rental4You.Models
     public class Registo
     {
         public int Id { get; set; }
+
+        [DataType(DataType.DateTime)]
+        [BindProperty, DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime Data { get; set; }
 
         [KmsReserva]

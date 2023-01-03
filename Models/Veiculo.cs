@@ -34,8 +34,8 @@ namespace Rental4You.Models
 		[DataType(DataType.Currency)]
 		public double CustoDia { get; set; }
 
-		[DisplayName("Disponível")]
-		public bool Disponivel { get; set; }
+		[DisplayName("Ativo")]
+		public bool Ativo { get; set; }
 
         public int EmpresaId { get; set; }
         public Empresa Empresa { get; set; }

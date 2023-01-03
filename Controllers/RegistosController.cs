@@ -193,7 +193,7 @@ namespace Rental4You.Models
 
                 }
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Reservas");
             }
             return View(registo);
         }
@@ -246,7 +246,7 @@ namespace Rental4You.Models
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Reservas");
             }
             return View(registo);
         }
