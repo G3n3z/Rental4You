@@ -103,12 +103,12 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Index" class="btn-sm btn-warning">Back to List</a>
+    <a asp-action="Index" class="btn btn-warning btn-sm">Voltar a Lista</a>
     @if(Model != null && Model.LevantamentoId != null){
-        <a asp-action="Details" asp-controller="Registos" asp-route-id="@Model.LevantamentoId" class="btn-sm btn-warning">Ver Levantamento</a>
+        <a asp-action="Details" asp-controller="Registos" asp-route-id="@Model.LevantamentoId" class="btn btn-warning btn-sm">Ver Levantamento</a>
     }
     @if(Model != null && Model.EntregaId != null){
-        <a asp-action="Details" asp-controller="Registos" asp-route-id="@Model.EntregaId" class="btn-sm btn-warning">Ver Entrega</a>
+        <a asp-action="Details" asp-controller="Registos" asp-route-id="@Model.EntregaId" class="btn btn-warning btn-sm">Ver Entrega</a>
     }
 </div>
 
