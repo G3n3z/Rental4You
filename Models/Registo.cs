@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,6 +13,9 @@ namespace Rental4You.Models
     public class Registo
     {
         public int Id { get; set; }
+
+        [DataType(DataType.DateTime)]
+        [BindProperty, DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime Data { get; set; }
 
         [Range(0, Double.PositiveInfinity, ErrorMessage ="O valor deve ser superior a 0")]
