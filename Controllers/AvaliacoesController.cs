@@ -58,11 +58,11 @@ namespace Rental4You.Models
                 {
                     return View(avaliacao);
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index","Reservas");
             }
             
                 ViewData["EmpresaId"] = new SelectList(_context.Empresas, "Id", "Id", avaliacao.EmpresaId);
-            return View(avaliacao);
+            return RedirectToAction("Details", "Reservas", new { id = avaliacao.ReservaId});
         }
 
         // POST: Avaliacoes/Edit/5

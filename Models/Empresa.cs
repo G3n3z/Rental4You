@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Rental4You.Models
@@ -14,6 +15,7 @@ namespace Rental4You.Models
 
 
         [DefaultValue(0.0)]
+        [BindProperty, DisplayFormat(DataFormatString = "{0: #.#}", ApplyFormatInEditMode = true)]
         public double MediaAvaliacao { get; set; }
 
         [Display(Name = "Subscrição")]

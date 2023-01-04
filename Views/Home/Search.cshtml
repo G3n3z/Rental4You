@@ -86,7 +86,7 @@
                         {
                             <div>Avaliação: -/-</div>
                         }else{
-                            <div>Avaliação: @Model.Veiculos[i].Empresa.MediaAvaliacao.ToString() / 10</div>
+                            <div>Avaliação: @Html.DisplayFor(model => model.Veiculos[i].Empresa.MediaAvaliacao) / 10</div>
                         }
                     }
                 </div>

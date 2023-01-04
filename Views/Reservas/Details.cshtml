@@ -67,10 +67,11 @@
             else if (Model.Avaliacao == null)
             {
                 <dt class="col-sm-2">
-                    Nota
+                    Nota (1 a 10)
                 </dt>
 
-                <input name="Nota" value="@Model?.Avaliacao?.Nota" />
+                <input name="Nota" asp-for="Avaliacao.Nota" />
+                <span asp-validation-for="Avaliacao.Nota" class="text-danger"></span>
                 <button type="submit" class="btn btn-primary">Submeter Avaliação</button>
             }
 
