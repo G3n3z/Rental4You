@@ -203,7 +203,7 @@ namespace Rental4You.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles= "Admin")]
+        [Authorize(Roles= "Admin, Gestor")]
         public async Task<IActionResult> ChangeStatus(string userId, [Bind("Active")] Boolean Active)
         {
             if(userId == null)
@@ -215,7 +215,12 @@ namespace Rental4You.Controllers
             {
                 return NotFound();
             }
-            user.Active = Active;
+			ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+			if (applicationUser == null || applicationUser.Id == userId)
+			{
+				return BadRequest();
+			}
+			user.Active = Active;
             _context.Update(user);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -236,12 +241,17 @@ namespace Rental4You.Controllers
             }
 
 			var user = await _context.Users
+                .Include(u => u.Registos)
                 .FirstOrDefaultAsync(m => m.Id == userId);
             if (user == null)
             {
                 return NotFound();
             }
-
+            if (user.Registos != null && user.Registos.Count() != 0)
+            {
+                ModelState.AddModelError("", "Não é possivel eliminar um utilizador com reservas");
+                return BadRequest();
+            }
             return View(user);
         }
 
@@ -255,15 +265,15 @@ namespace Rental4You.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.Users'  is null.");
             }
-            var user = await _context.Users.FindAsync(Id);
+            var user = await _context.Users.Include(u => u.Registos).FirstOrDefaultAsync(u => u.Id == Id);
+            if (user.Registos != null && user.Registos.Count() != 0)
+            {
+                ModelState.AddModelError("", "Não é possivel eliminar um utilizador com reservas");
+                return View(user);
+            }
             if (user != null)
             {
                 _context.Users.Remove(user);
-            }
-            if(user.Registos != null && user.Registos.Count() != 0)
-            {
-                ModelState.AddModelError("","Não é possivel eliminar um utilizador com reservas");
-                return View(user);
             }
 
             await _context.SaveChangesAsync();

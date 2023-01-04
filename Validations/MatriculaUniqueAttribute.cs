@@ -24,7 +24,7 @@ namespace Rental4You.Validations
             {
                 return new ValidationResult(GetErrorMessage(value.ToString()));
             }
-            _context.Entry(entity).State = EntityState.Detached;
+            //_context.Entry(entity).State = EntityState.Detached; verificar a necessidade nao tive erros em comentario
             return ValidationResult.Success;
         }
 
