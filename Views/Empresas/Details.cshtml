@@ -10,30 +10,48 @@
     <h4>Empresa</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Nome)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Nome)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Localidade)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Localidade)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MediaAvaliacao)
+        </dt>
+        @if (Model.MediaAvaliacao == -1)
+        {
+            <dd class="col-sm-10">Ainda nao tem avaliações</dd>
+        }
+
+        else
+        {
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.MediaAvaliacao)
+            </dd>
+        }
+
+
+       
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Activo)
         </dt>
+
         @if (Model.Activo == true)
         {
-            <dd class = "col-sm-10">
-               Ativa
+            <dd class="col-sm-10">
+                Ativa
             </dd>
         }
         else
         {
-            <dd class = "col-sm-10">
+            <dd class="col-sm-10">
                 Inativa
             </dd>
         }
@@ -42,5 +60,5 @@
 <br />
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning btn-sm">Editar</a> |
-    <a asp-action="Index" class="btn btn-secondary btn-sm">Voltar � lista</a>
+    <a asp-action="Index" class="btn btn-secondary btn-sm">Voltar � lista</a>
 </div>

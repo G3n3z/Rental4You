@@ -241,7 +241,7 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Localidade,Activo")] Empresa empresa)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Localidade,MediaAvaliacao,Activo")] Empresa empresa)
         {
             if (id != empresa.Id)
             {
@@ -290,7 +290,7 @@ namespace Rental4You.Models
             {
                 return NotFound();
             }
-			if (empresa.Veiculos != null)
+			if (empresa.Veiculos != null && empresa.Veiculos.Count() > 0)
             {
                 return BadRequest();
             }
