@@ -18,6 +18,12 @@
                 <dd class = "col-sm-9">
                     @Html.DisplayFor(model => model.Data)
                 </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Funcionario)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Funcionario.PrimeiroNome) @Html.DisplayFor(model => model.Funcionario.UltimoNome)
+                </dd>
                 <dt class = "col-sm-3">
                     @Html.DisplayNameFor(model => model.Kms)
                 </dt>
@@ -58,6 +64,6 @@
     </div>
 </div>
 <div>
-    <a asp-action="Edit" class="btn btn-warning btn-sm" asp-route-id="@Model?.Id">Editar</a>
+    @*<a asp-action="Edit" class="btn btn-warning btn-sm" asp-route-id="@Model?.Id">Editar</a>*@
     <a asp-action="Index" asp-controller="Reservas" class="btn btn-secondary btn-sm">Voltar a Lista</a>
 </div>

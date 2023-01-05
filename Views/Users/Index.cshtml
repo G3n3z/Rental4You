@@ -39,7 +39,7 @@
 
 				<td>
 					<div class="row">
-						@if (!viewModel.HaveRegister && ViewBag.userId != viewModel.UserId)
+						@if (ViewBag.userId != viewModel.UserId)
 						{
 							<div class="col-6">
 								<form asp-action="ChangeStatus" asp-controller="Users" asp-route-userId="@viewModel.UserId">
@@ -55,7 +55,7 @@
 									}
 								</form>
 							</div>
-							@if (User.IsInRole("Gestor") && viewModel.HaveRegister)
+							@if (User.IsInRole("Gestor") && !viewModel.HaveRegister)
 							{
 								<div class="col-6">
 									<a asp-controller="Users" asp-action="Delete" asp-route-userId="@viewModel.UserId" class="btn btn-danger btn-sm" style="width: 90px;">Eliminar</a>

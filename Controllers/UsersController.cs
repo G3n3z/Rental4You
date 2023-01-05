@@ -46,7 +46,10 @@ namespace Rental4You.Controllers
             }
             else if (User.IsInRole("Gestor"))
             {
-                users = _userManager.Users.Where(user => user.EmpresaId == applicationUser.EmpresaId).ToList();
+                users = _userManager.Users
+                    .Where(user => user.EmpresaId == applicationUser.EmpresaId)
+                    .Include(user => user.Registos)
+                    .ToList();
             }
             users?.ForEach(user =>
             {
@@ -70,6 +73,10 @@ namespace Rental4You.Controllers
         [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Create([Bind("Id,PrimeiroNome,UltimoNome,DataNascimento,Email,NIF,EmpresaId")] ApplicationUser user, string role)
         {
+            List<IdentityRole> roles;
+            roles = _roleManager.Roles.Where(r => r.Name == Roles.Gestor.ToString() || r.Name == Roles.Funcionario.ToString()).ToList();
+            ViewData["Roles"] = new SelectList(roles, "Name", "Name");
+
             if (user.DataNascimento >= DateTime.Today)
             {
                 ModelState.AddModelError("DataNascimento", "A data de nascimento não pode ser igual ou superior à data atual");
@@ -80,10 +87,6 @@ namespace Rental4You.Controllers
             ModelState.Remove(nameof(user.Empresa));
             ModelState.Remove(nameof(user.Reservas));
             ModelState.Remove(nameof(user.Registos));
-
-            List<IdentityRole> roles;
-            roles = _roleManager.Roles.Where(r => r.Name == Roles.Gestor.ToString() || r.Name == Roles.Funcionario.ToString()).ToList();
-            ViewData["Roles"] = new SelectList(roles, "Name", "Name");
 
             if (role == null || (role != Roles.Funcionario.ToString() && role != Roles.Gestor.ToString()))
             {
@@ -97,7 +100,15 @@ namespace Rental4You.Controllers
             if (ModelState.IsValid)
             {
                 user.UserName = user.Email;
-                var result = await _userManager.CreateAsync(user, "Funcionario123!");
+                IdentityResult result = null;
+                if(role == Roles.Funcionario.ToString())
+                {
+                    result = await _userManager.CreateAsync(user, "Funcionario123!");
+                }
+                else if(role == Roles.Gestor.ToString())
+                {
+                    result = await _userManager.CreateAsync(user, "Gestor123!");
+                }
                 if (!result.Succeeded)
                 {
                     ModelState.AddModelError("", "Nao foi possivel criar o utilizador");
@@ -285,7 +296,6 @@ namespace Rental4You.Controllers
 		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetDadosNovosUtilizadoresMensais()
 		{
-			//dados de exemplo
 			List<object> dados = new List<object>();
 			DataTable dt = new DataTable();
 			dt.Columns.Add("Utilizadores", Type.GetType("System.String"));
@@ -296,15 +306,18 @@ namespace Rental4You.Controllers
 				.GroupBy(r => new { date = new DateTime(r.DataRegisto.Year, r.DataRegisto.Month, 1) })
 				.Select(r => new
 				{
-					Mes = r.Key.date.ToString("MMM/yyyy"),
+					Mes = r.Key.date,
 					Qtd = r.Count()
 				})
 				.ToListAsync();
+
+            dadosUsers = dadosUsers.OrderBy(d => d.Mes).ToList();
+
 			DataRow dr;
 			foreach (var user in dadosUsers)
 			{
 				dr = dt.NewRow();
-				dr["Utilizadores"] = user.Mes;
+				dr["Utilizadores"] = user.Mes.ToString("MMM/yyyy");
 				dr["Quantidade"] = user.Qtd;
 				dt.Rows.Add(dr);
 			}
