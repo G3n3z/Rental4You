@@ -230,7 +230,7 @@ namespace Rental4You.Models
 			}
 			reserva.ApplicationUser = user;
 			reserva.ApplicationUserId = user.Id;
-            reserva.DataReserva = DateTime.Now;
+            reserva.DataReserva = DateTime.Today;
 
             if (ModelState.IsValid)
 			{
@@ -457,7 +457,7 @@ namespace Rental4You.Models
 			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
 
 			var dadosReservas = await _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddMonths(-12) && r.DataReserva <= DateTime.Today)
+				.Where(r => r.DataReserva >= DateTime.Now.AddMonths(-12) && r.DataReserva <= DateTime.Now)
 				.GroupBy(r => new { date = new DateTime(r.DataReserva.Year, r.DataReserva.Month, 1) })
                 .Select(r => new
 				{

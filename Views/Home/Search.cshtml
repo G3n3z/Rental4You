@@ -1,108 +1,118 @@
 ﻿@model Rental4You.ViewModel.SearchViewModel
 @{
-        ViewData["Title"] = "Search Page";
+	ViewData["Title"] = "Search Page";
 }
 
 <div class="container">
-    <form asp-action="Search", name="pesquisa" method="get">
-        <div class="row">
-            <div class="col-4 form-group mb-2">
-                <input type="text" asp-for="Localizacao"  placeholder="Localização" class="form-control" />
-                <span asp-validation-for="Localizacao" class="text-danger"></span>
-            </div>
-            <div class="col-4 form-group mb-2">
-                <input asp-for="DataLevantamento" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
-                <span asp-validation-for="DataLevantamento" class="text-danger"></span>
-            </div>
-            <div class="col-4 form-group mb-2">
-                <input asp-for="DataEntrega" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}"/>
-            </div>
-            
-        </div>
-        <div class="row">
-            <div class="col-12">Filtros:</div>
-        </div>
-        <div class="row">
-            <div class="col-3 form-group mb-2">
-                <label asp-for="FiltroEmpresa"> Empresa</label>
-                <select asp-for="FiltroEmpresa" asp-items="ViewBag.Empresas" class="form-control"></select>
-            </div>
-            <div class="col-3 form-group mb-2">
-                <label asp-for="FiltroCategoria"> Categorias</label>
-                <select asp-for="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control"></select>
-            </div>
-            
-        </div>
-        <div class="row">
-            <div class="col-12">Ordenar Por:</div>
-        </div>
-        <div class="row">
-            <div class="col-3 form-group mb-2">
-                <select asp-for="Order" asp-items="ViewBag.Order" class="form-control"></select>
-            </div>
-        </div>
-        <div class="col-3 form-group mb-2">
-                <button type="submit" class="btn btn-success">Pesquisar</button>
-        </div>
-    </form>
+	<form asp-action="Search" , name="pesquisa" method="get">
+		<div class="row">
+			<div class="col-4 form-group mb-2">
+				<input type="text" asp-for="Localizacao" placeholder="Localização" class="form-control" />
+				<span asp-validation-for="Localizacao" class="text-danger"></span>
+			</div>
+			<div class="col-4 form-group mb-2">
+				<input asp-for="DataLevantamento" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+				<span asp-validation-for="DataLevantamento" class="text-danger"></span>
+			</div>
+			<div class="col-4 form-group mb-2">
+				<input asp-for="DataEntrega" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+			</div>
+
+		</div>
+		<div class="row">
+			<div class="col-12">Filtros:</div>
+		</div>
+		<div class="row">
+			<div class="col-3 form-group mb-2">
+				<label asp-for="FiltroEmpresa"> Empresa</label>
+				<select asp-for="FiltroEmpresa" asp-items="ViewBag.Empresas" class="form-control"></select>
+			</div>
+			<div class="col-3 form-group mb-2">
+				<label asp-for="FiltroCategoria"> Categorias</label>
+				<select asp-for="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control"></select>
+			</div>
+
+		</div>
+		<div class="row">
+			<div class="col-12">Ordenar Por:</div>
+		</div>
+		<div class="row">
+			<div class="col-3 form-group mb-2">
+				<select asp-for="Order" asp-items="ViewBag.Order" class="form-control"></select>
+			</div>
+		</div>
+		<div class="col-3 form-group mb-2">
+			<button type="submit" class="btn btn-success">Pesquisar</button>
+		</div>
+	</form>
 </div>
+<br />
 
-@if(Model.Veiculos != null){
-    <div class="list-group"></div>
-    @for(int i = 0; i < Model.Veiculos.Count(); i++)
-        {
-        <div class="list-group-item list-group-item-action flex-column align-items-start" >
-            <div class="row align-items-center">
-                <div class="col-2 d-flex justify-content-center">
-                    @if (i >= @ViewBag.NFich || @ViewBag.Ficheiros[i] == "")
-                    {
-                        <img src="/Ficheiros/No_Image.webp" class="img-thumbnail" style="max-width:150px; max-height:150px;border-radius:10px; border:1px dotted #ccc;" />
-                    }
-                    else
-                    {
-                        <img src="@ViewBag.Ficheiros[i]" class="img-thumbnail" style="max-width:150px; max-height:150px;border-radius:10px; border:1px dotted #ccc;" />
-                    }
-                </div>
-                <div class="col-3 mb-3">
-                    <div class="mb-3">@Model.Veiculos[i].Veiculo.Nome</div>
-                    <div>@Model.Veiculos[i].Veiculo.Descricao</div>
+@if (Model.Veiculos != null)
+{
+	<div>
+		Resultado da sua pesquisa: @Model.Veiculos.Count() veiculo(s) encontrado(s)
+	</div>
 
-                </div>
-                <div class="col-3 mb-3">
-                    <div class="mb-3">
-                        <label>Preco:</label>
-                        <label>@Model.Veiculos[i].Veiculo.CustoDia€/Dia </label>
-                    </div>
-                    <div>
-                        <label>Preço Total: </label>
-                        <label>@Model.Veiculos[i].Preco€</label>
-                    </div>
-                    
-                </div>
-                <div class="col-2 mb-3">
-                    <div class="mb-3">Empresa: @Model.Veiculos[i].Empresa.Nome</div>
-                    @if(Model.Veiculos[i].Empresa != null && Model.Veiculos[i].Empresa.Avaliacoes != null ){
-                        @if (Model.Veiculos[i].Empresa.MediaAvaliacao == -1)
-                        {
-                            <div>Avaliação: -/-</div>
-                        }else{
-                            <div>Avaliação: @Html.DisplayFor(model => model.Veiculos[i].Empresa.MediaAvaliacao) / 10</div>
-                        }
-                    }
-                </div>
-                @if(User.IsInRole("Cliente")){
-                <div class="col-2 mb-3">
-                        <form asp-controller="Reservas" asp-action="NovaReserva" method="post">
-                            <input type="hidden" name="idVeiculo" value="@Model.Veiculos[i].Veiculo.Id" />
-                            <input type="hidden" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento" />
-                            <input type="hidden" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" />
-                            <button type="submit" class="btn btn-success">Reservar</button>
-                        </form>
-                </div>
-                }
-            </div>
-        </div>
-    }
+	<div class="list-group"></div>
+	@for (int i = 0; i < Model.Veiculos.Count(); i++)
+	{
+		<div class="list-group-item list-group-item-action flex-column align-items-start">
+			<div class="row align-items-center">
+				<div class="col-2 d-flex justify-content-center">
+					@if (i >= @ViewBag.NFich || @ViewBag.Ficheiros[i] == "")
+					{
+						<img src="/Ficheiros/No_Image.webp" class="img-thumbnail" style="max-width:150px; max-height:150px;border-radius:10px; border:1px dotted #ccc;" />
+					}
+					else
+					{
+						<img src="@ViewBag.Ficheiros[i]" class="img-thumbnail" style="max-width:150px; max-height:150px;border-radius:10px; border:1px dotted #ccc;" />
+					}
+				</div>
+				<div class="col-3 mb-3">
+					<div class="mb-3">@Model.Veiculos[i].Veiculo.Nome</div>
+					<div>@Model.Veiculos[i].Veiculo.Descricao</div>
+
+				</div>
+				<div class="col-3 mb-3">
+					<div class="mb-3">
+						<label>Preco:</label>
+						<label>@Model.Veiculos[i].Veiculo.CustoDia€/Dia </label>
+					</div>
+					<div>
+						<label>Preço Total: </label>
+						<label>@Model.Veiculos[i].Preco€</label>
+					</div>
+
+				</div>
+				<div class="col-2 mb-3">
+					<div class="mb-3">Empresa: @Model.Veiculos[i].Empresa.Nome</div>
+					@if (Model.Veiculos[i].Empresa != null && Model.Veiculos[i].Empresa.Avaliacoes != null)
+					{
+						@if (Model.Veiculos[i].Empresa.MediaAvaliacao == -1)
+						{
+							<div>Avaliação: -/-</div>
+						}
+						else
+						{
+							<div>Avaliação: @Html.DisplayFor(model => model.Veiculos[i].Empresa.MediaAvaliacao) / 10</div>
+						}
+					}
+				</div>
+				@if (User.IsInRole("Cliente"))
+				{
+					<div class="col-2 mb-3">
+						<form asp-controller="Reservas" asp-action="NovaReserva" method="post">
+							<input type="hidden" name="idVeiculo" value="@Model.Veiculos[i].Veiculo.Id" />
+							<input type="hidden" name="DataLevantamento" value="@ViewBag.pesquisa.DataLevantamento" />
+							<input type="hidden" name="DataEntrega" value="@ViewBag.pesquisa.DataEntrega" />
+							<button type="submit" class="btn btn-success">Reservar</button>
+						</form>
+					</div>
+				}
+			</div>
+		</div>
+	}
 }
 
 

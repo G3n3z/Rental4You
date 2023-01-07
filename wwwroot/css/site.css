@@ -16,3 +16,10 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.home_bg_image {
+    background-image: url('/Ficheiros/home_bg_image.jpeg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}

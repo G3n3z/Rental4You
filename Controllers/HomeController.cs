@@ -87,8 +87,11 @@ namespace Rental4You.Controllers
                 .GroupBy(r => r.DataReserva)
                 .Count();
 
+            if(mediaDiaria.Equals(double.NaN)) { 
+                mediaDiaria = 0.0;
+            }
 
-			ViewBag.faturacao7d = faturacao7d.ToString("C", CultureInfo.CurrentCulture);
+            ViewBag.faturacao7d = faturacao7d.ToString("C", CultureInfo.CurrentCulture);
             ViewBag.faturacao30d = faturacao30d.ToString("C", CultureInfo.CurrentCulture);
             ViewBag.mediaDiaria = mediaDiaria.ToString("N1", CultureInfo.CurrentCulture);
 
