@@ -191,7 +191,7 @@ namespace Rental4You.Models
 			reserva.CustoTotal = ((int)Math.Ceiling(dias)) * veiculo.CustoDia;
 			reserva.DataLevantamento = datalevantamento;
 			reserva.DataEntrega = dataentrega;
-			
+
 			return View();
 		}
 
@@ -230,9 +230,9 @@ namespace Rental4You.Models
 			}
 			reserva.ApplicationUser = user;
 			reserva.ApplicationUserId = user.Id;
-            reserva.DataReserva = DateTime.Now;
+			reserva.DataReserva = DateTime.Today;
 
-            if (ModelState.IsValid)
+			if (ModelState.IsValid)
 			{
 				_context.Add(reserva);
 				await _context.SaveChangesAsync();
@@ -419,7 +419,32 @@ namespace Rental4You.Models
 			dt.Columns.Add("Reservas", Type.GetType("System.String"));
 			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
 
-			var dadosReservas = await _context.Reservas
+			var user = await _userManager.GetUserAsync(User);
+
+			if (User.IsInRole("Gestor"))
+			{
+				var dadosReservas = await _context.Reservas
+					.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now && r.Veiculo.EmpresaId == user.EmpresaId)
+					.GroupBy(r => r.DataReserva)
+					.Select(r => new
+					{
+						Data = new DateOnly(r.Key.Year, r.Key.Month, r.Key.Day),
+						Qtd = r.Count()
+					})
+					.ToListAsync();
+
+				DataRow dr;
+				foreach (var reserva in dadosReservas)
+				{
+					dr = dt.NewRow();
+					dr["Reservas"] = reserva.Data;
+					dr["Quantidade"] = reserva.Qtd;
+					dt.Rows.Add(dr);
+				}
+			}
+			else
+			{
+				var dadosReservas = await _context.Reservas
 				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now)
 				.GroupBy(r => r.DataReserva)
 				.Select(r => new
@@ -428,14 +453,15 @@ namespace Rental4You.Models
 					Qtd = r.Count()
 				})
 				.ToListAsync();
-
-			DataRow dr;
-			foreach (var reserva in dadosReservas)
-			{
-				dr = dt.NewRow();
-				dr["Reservas"] = reserva.Data;
-				dr["Quantidade"] = reserva.Qtd;
-				dt.Rows.Add(dr);
+				
+				DataRow dr;
+				foreach (var reserva in dadosReservas)
+				{
+					dr = dt.NewRow();
+					dr["Reservas"] = reserva.Data;
+					dr["Quantidade"] = reserva.Qtd;
+					dt.Rows.Add(dr);
+				}
 			}
 
 			foreach (DataColumn dc in dt.Columns)
@@ -457,14 +483,14 @@ namespace Rental4You.Models
 			dt.Columns.Add("Quantidade", Type.GetType("System.Int32"));
 
 			var dadosReservas = await _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddMonths(-12) && r.DataReserva <= DateTime.Today)
+				.Where(r => r.DataReserva >= DateTime.Now.AddMonths(-12) && r.DataReserva <= DateTime.Now)
 				.GroupBy(r => new { date = new DateTime(r.DataReserva.Year, r.DataReserva.Month, 1) })
-                .Select(r => new
+				.Select(r => new
 				{
 					Mes = r.Key.date,
 					Qtd = r.Count()
 				})
-                .ToListAsync();
+				.ToListAsync();
 
 			dadosReservas = dadosReservas.OrderBy(d => d.Mes).ToList();
 

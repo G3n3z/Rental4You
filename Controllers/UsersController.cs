@@ -95,6 +95,7 @@ namespace Rental4You.Controllers
             ApplicationUser gestor = await _userManager.GetUserAsync(User);
             user.EmpresaId = gestor.EmpresaId;
             user.EmailConfirmed = true;
+            user.DataRegisto = DateTime.Now;
 
 
             if (ModelState.IsValid)

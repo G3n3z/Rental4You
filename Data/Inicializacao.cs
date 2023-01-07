@@ -175,7 +175,8 @@ namespace Escola_Segura.Data
                 NIF = "12345678",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Active = true
+                Active = true,
+                DataRegisto = DateTime.Now.AddDays(-1)
             };
 
             var user7 = new ApplicationUser
@@ -187,14 +188,50 @@ namespace Escola_Segura.Data
                 NIF = "12348678",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Active = true
+                Active = true,
+                DataRegisto = DateTime.Now.AddMonths(-5)
             };
+
+            var user8 = new ApplicationUser
+            {
+                UserName = "rui@fake.com",
+                Email = "rui@fake.com",
+                PrimeiroNome = "Rui",
+                UltimoNome = "Silva",
+                NIF = "12348678",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Active = true,
+                DataRegisto = DateTime.Now.AddMonths(-3)
+            };
+
+            var user9 = new ApplicationUser
+            {
+                UserName = "tiago@fake.com",
+                Email = "tiago@fake.com",
+                PrimeiroNome = "Tiago",
+                UltimoNome = "Pires",
+                NIF = "12348678",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Active = true,
+                DataRegisto = DateTime.Now.AddMonths(-3)
+            };
+
             await userManager.CreateAsync(user6, "Asd123!");
             await userManager.AddToRoleAsync(user6,
            Roles.Cliente.ToString());
 
             await userManager.CreateAsync(user7, "Asd123!");
             await userManager.AddToRoleAsync(user7,
+           Roles.Cliente.ToString());
+            
+            await userManager.CreateAsync(user8, "Asd123!");
+            await userManager.AddToRoleAsync(user8,
+           Roles.Cliente.ToString());
+            
+            await userManager.CreateAsync(user9, "Asd123!");
+            await userManager.AddToRoleAsync(user9,
            Roles.Cliente.ToString());
 
             Categoria categoria = new Categoria();

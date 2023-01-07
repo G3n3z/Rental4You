@@ -47,8 +47,8 @@ namespace Rental4You.Models
                     var empresa = _context.Empresas.FirstOrDefault(e => e.Id == avaliacao.EmpresaId);
                     if (empresa == null)
                     {
-                        return View(avaliacao);
-                    }
+						return NotFound();
+					}
                     empresa.MediaAvaliacao = media;
                 
                     _context.Update(empresa);
@@ -56,8 +56,8 @@ namespace Rental4You.Models
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    return View(avaliacao);
-                }
+					return BadRequest();
+				}
                 return RedirectToAction("Index","Reservas");
             }
             
@@ -70,7 +70,8 @@ namespace Rental4You.Models
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,EmpresaId")] Avaliacao avaliacao)
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Edit(int id, [Bind("Id,EmpresaId")] Avaliacao avaliacao)
         {
             if (id != avaliacao.Id)
             {
@@ -103,7 +104,7 @@ namespace Rental4You.Models
 
         private bool AvaliacaoExists(int id)
         {
-          return (_context.Avaliacoes?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Avaliacoes?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

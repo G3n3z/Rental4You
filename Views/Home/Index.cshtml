@@ -1,39 +1,43 @@
 ﻿@model Rental4You.ViewModel.SearchViewModel
 @{
-    ViewData["Title"] = "Home Page";
+	ViewData["Title"] = "Home Page";
+	Layout = "~/Views/Shared/_LayoutHomeClient.cshtml";
 }
 
 <div class="text-center mb-3">
-    <h1 class="display-4">Rental4You</h1>
+	<h1 class="display-4">Rental4You</h1>
 </div>
 
 
-<div class="container mt-3">
-    <form asp-action="Search" method="get">
-       <div class="row">
-           <div class="col-4 form-group mb-2">
-               <input type="text" asp-for="Localizacao" placeholder="Localização" class="form-control" />
-               <span asp-validation-for="Localizacao" class="text-danger"></span>
-           </div>
-           <div class="col-2 form-group mb-2">
-               <input asp-for="DataLevantamento" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
-               <span asp-validation-for="DataLevantamento" class="text-danger"></span>
-           </div>
-           <div class="col-2 form-group mb-2">
-               <input asp-for="DataEntrega" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
-           </div>
-           <div class="col-2 form-group mb-2">
-               <select name="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control" ></select>
-           </div>
-           <div class="col-2 form-group mb-2">
-               <button type="submit" class="btn btn-success">Pesquisar</button>
-           </div>
-       </div>
-    </form>
+<div class=".bg-image home_bg_image" style="height: 50vh;">
+	<br />
+	<div class="container mt-3">
+		<form asp-action="Search" method="get">
+			<div class="row">
+				<div class="col-4 form-group mb-2">
+					<input type="text" asp-for="Localizacao" placeholder="Localização" class="form-control" />
+					<span asp-validation-for="Localizacao" class="text-danger"></span>
+				</div>
+				<div class="col-2 form-group mb-2">
+					<input asp-for="DataLevantamento" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+					<span asp-validation-for="DataLevantamento" class="text-danger"></span>
+				</div>
+				<div class="col-2 form-group mb-2">
+					<input asp-for="DataEntrega" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+				</div>
+				<div class="col-2 form-group mb-2">
+					<select name="FiltroCategoria" asp-items="ViewBag.Categorias" class="form-control"></select>
+				</div>
+				<div class="col-2 form-group mb-2">
+					<button type="submit" class="btn btn-success">Pesquisar</button>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 }
