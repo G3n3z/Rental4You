@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +17,13 @@ namespace Rental4You.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+		private readonly UserManager<ApplicationUser> _userManager;
+		public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _context = context;
-        }
+			_userManager = userManager;
+		}
 
         public IActionResult Index()
         {
@@ -70,20 +73,22 @@ namespace Rental4You.Controllers
 		[Authorize(Roles = "Gestor")]
 		public async Task<IActionResult> DashboardGestor()
 		{
+            var user = await _userManager.GetUserAsync(User);
+
             var faturacao7d = _context.Reservas
-                .Where(r => r.DataReserva >= DateTime.Now.AddDays(-7) && r.DataReserva <= DateTime.Now)
-                .Sum(r => r.CustoTotal);
+                .Where(r => r.DataReserva >= DateTime.Now.AddDays(-7) && r.DataReserva <= DateTime.Now && r.Veiculo.EmpresaId == user.EmpresaId)
+				.Sum(r => r.CustoTotal);
 
 			var faturacao30d = _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now)
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now && r.Veiculo.EmpresaId == user.EmpresaId)
 				.Sum(r => r.CustoTotal);
 
 			double mediaDiaria = _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now)
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now && r.Veiculo.EmpresaId == user.EmpresaId)
 				.Count();
 
             mediaDiaria /= _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now)
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now && r.Veiculo.EmpresaId == user.EmpresaId)
                 .GroupBy(r => r.DataReserva)
                 .Count();
 
