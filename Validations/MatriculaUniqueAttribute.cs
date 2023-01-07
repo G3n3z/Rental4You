@@ -24,7 +24,10 @@ namespace Rental4You.Validations
             {
                 return new ValidationResult(GetErrorMessage(value.ToString()));
             }
-            _context.Entry(entity).State = EntityState.Detached;
+            if (veiculo.Id != 0 && entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
             return ValidationResult.Success;
         }
 

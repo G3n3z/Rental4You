@@ -71,26 +71,26 @@ namespace Rental4You.Controllers
 		public async Task<IActionResult> DashboardGestor()
 		{
             var faturacao7d = _context.Reservas
-                .Where(r => r.DataReserva >= DateTime.Now.AddDays(-7) && r.DataReserva <= DateTime.Today)
+                .Where(r => r.DataReserva >= DateTime.Now.AddDays(-7) && r.DataReserva <= DateTime.Now)
                 .Sum(r => r.CustoTotal);
 
 			var faturacao30d = _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now)
 				.Sum(r => r.CustoTotal);
 
 			double mediaDiaria = _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now)
 				.Count();
 
             mediaDiaria /= _context.Reservas
-				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Today)
+				.Where(r => r.DataReserva >= DateTime.Now.AddDays(-30) && r.DataReserva <= DateTime.Now)
                 .GroupBy(r => r.DataReserva)
                 .Count();
 
 
 			ViewBag.faturacao7d = faturacao7d.ToString("C", CultureInfo.CurrentCulture);
             ViewBag.faturacao30d = faturacao30d.ToString("C", CultureInfo.CurrentCulture);
-            ViewBag.mediaDiaria = mediaDiaria;
+            ViewBag.mediaDiaria = mediaDiaria.ToString("N1", CultureInfo.CurrentCulture);
 
 			return View();
 		}

@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<Rental4You.ViewModel.UserRolesViewModel>
 @{
-    ViewData["Title"] = "Role Manager Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    
+	ViewData["Title"] = "Role Manager Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 <h1>Utilizadores</h1>
@@ -10,66 +10,69 @@
 <a class="btn btn-primary btn-sm" asp-controller="Users" asp-action="Create">Novo</a>
 
 <table class="table table-striped table-hover table-bordered mt-4">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.PrimeiroNome)</th>
-            <th>@Html.DisplayNameFor(model => model.UltimoNome)</th>
-            <th>@Html.DisplayNameFor(model => model.Email)</th>
-            <th>@Html.DisplayNameFor(model => model.Roles)</th>
-            <th>@Html.DisplayNameFor(model => model.IsActive)</th>
-            <th>Ação</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var viewModel in Model)
-        {
-            <tr>
-                <td>@viewModel.PrimeiroNome</td>
-                <td>@viewModel.UltimoNome</td>
-                <td>@viewModel.Email</td>
-                <td>@String.Join(",", viewModel.Roles)</td>
-                @if (viewModel.IsActive == true)
-                {
-                    <td>Ativo</td>
-                }
-                else
-                {
-                    <td>Inativo</td>
-                }
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.PrimeiroNome)</th>
+			<th>@Html.DisplayNameFor(model => model.UltimoNome)</th>
+			<th>@Html.DisplayNameFor(model => model.Email)</th>
+			<th>@Html.DisplayNameFor(model => model.Roles)</th>
+			<th>@Html.DisplayNameFor(model => model.IsActive)</th>
+			<th>Ação</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var viewModel in Model)
+		{
+			<tr>
+				<td>@viewModel.PrimeiroNome</td>
+				<td>@viewModel.UltimoNome</td>
+				<td>@viewModel.Email</td>
+				<td>@String.Join(",", viewModel.Roles)</td>
+				@if (viewModel.IsActive == true)
+				{
+					<td>Ativo</td>
+				}
+				else
+				{
+					<td>Inativo</td>
+				}
 
-                <td>
-                    <div class="row">
-                        <div class="col-6">
-                            <form asp-action="ChangeStatus" asp-controller="Users" asp-route-userId="@viewModel.UserId">
-                                @if (@viewModel.IsActive)
-                                {
-                                    <input type="hidden" name="Active" value="false" />
-                                    <button type="submit" class="btn btn-warning btn-sm" style="width:90px;">Desativar</button>
-                                }
-                                else
-                                {
-                                    <input type="hidden" name="Active" value="true" />
-                                    <button type="submit" class="btn btn-success btn-sm" style="width:90px;">Activar</button>
-                                }
-                            </form>
-                        </div>
-                        @if (!viewModel.HaveRegister && User.IsInRole("Gestor") && ViewBag.userId != viewModel.UserId)
-                        {
-                            <div class="col-6">
-                                <a asp-controller="Users" asp-action="Delete" asp-route-userId="@viewModel.UserId" class="btn btn-danger btn-sm" style="width: 90px;">Eliminar</a>
-                            </div>
-                        }
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <div class="col-6">
-                                <a asp-controller="Users" asp-action="Edit" asp-route-userId="@viewModel.UserId" class="btn btn-info btn-sm" style="width: 90px;">Editar</a>
-                            </div>
-                        }
-                    </div>
-                </td>
+				<td>
+					<div class="row">
+						@if (ViewBag.userId != viewModel.UserId)
+						{
+							<div class="col-6">
+								<form asp-action="ChangeStatus" asp-controller="Users" asp-route-userId="@viewModel.UserId">
+									@if (@viewModel.IsActive)
+									{
+										<input type="hidden" name="Active" value="false" />
+										<button type="submit" class="btn btn-warning btn-sm" style="width:90px;">Desativar</button>
+									}
+									else
+									{
+										<input type="hidden" name="Active" value="true" />
+										<button type="submit" class="btn btn-success btn-sm" style="width:90px;">Activar</button>
+									}
+								</form>
+							</div>
+							@if (User.IsInRole("Gestor") && !viewModel.HaveRegister)
+							{
+								<div class="col-6">
+									<a asp-controller="Users" asp-action="Delete" asp-route-userId="@viewModel.UserId" class="btn btn-danger btn-sm" style="width: 90px;">Eliminar</a>
+								</div>
+							}
+						}
+						@if (User.IsInRole("Admin"))
+						{
+							<div class="col-6">
+								<a asp-controller="Users" asp-action="Edit" asp-route-userId="@viewModel.UserId" class="btn btn-info btn-sm" style="width: 90px;">Editar</a>
+							</div>
+						}
+					</div>
+				</td>
 
-            </tr>
-        }
+			</tr>
+		}
 
-    </tbody>
+	</tbody>
 </table>
